@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import subprocess
 from io import BytesIO
 from shlex import quote
