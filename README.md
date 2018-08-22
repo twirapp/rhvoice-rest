@@ -22,8 +22,12 @@ rhvoice-rest
     docker build -t rhvoice-rest -f Dockerfile.arm64v8 .
     docker run -d -p 8080:8080 rhvoice-rest
 
-### Устновка
-[TODO]
+### Устновка скриптом на debian-based дистрибутивах в качестве сервиса
+    git clone https://github.com/Aculeasis/rhvoice-rest
+    cd rhvoice-rest
+    chmod +x install.sh
+    sudo ./install.sh
+Статус сервиса `sudo systemctl status rhvoice-rest.service`
 
 ## API
     http://SERVER/say?
