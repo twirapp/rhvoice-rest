@@ -12,7 +12,7 @@ ARG REMOVE_ME="dpkg-dev libcc1-0 libdpkg-perl libportaudiocpp0"
 RUN apt-get update -y && \
     apt-get -y install --no-install-recommends $RUNTIME_PACKAGES && \
     apt-get -y install --no-install-recommends $BUILD_PACKAGES && \
-    pip3 install flask && \
+    pip3 install flask pymorphy2 && \
     git clone https://github.com/Olga-Yakovleva/RHVoice.git /opt/RHVoice && \
     cd /opt/RHVoice && git checkout ee8be30 && scons && scons install && ldconfig && \
     git clone https://github.com/vantu5z/RHVoice-dictionary.git /opt/RHVoice-dictionary && \
