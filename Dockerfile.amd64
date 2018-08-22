@@ -1,16 +1,30 @@
-FROM phusion/baseimage:0.10.1
+FROM amd64/ubuntu:bionic
 
-RUN install_clean git scons build-essential libao4 libao-dev pkg-config flite1-dev libao-dev portaudio19-dev lame opus-tools python3 python3-pip python3-setuptools locales locales-all && \
+ARG RUNTIME_PACKAGES="ca-certificates lame libao-common libao4 libasound2 libasound2-data libexpat1 libflac8 \
+libjack-jackd2-0 libmp3lame0 libmpdec2 libogg0 libopus0 libpcap0.8 libportaudio2 libpython3-stdlib \
+libpython3.6-minimal libpython3.6-stdlib libreadline7 libsamplerate0 libsndfile1 libsqlite3-0 libssl1.1 libvorbis0a \
+libvorbisenc2 locales locales-all mime-support multiarch-support openssl opus-tools python-pip-whl python3 \
+python3-distutils python3-lib2to3 python3-minimal python3-pip python3-pkg-resources python3-setuptools python3.6 \
+python3.6-minimal readline-common"
+ARG BUILD_PACKAGES="git scons build-essential libao-dev pkg-config flite1-dev libao-dev portaudio19-dev"
+ARG REMOVE_ME="dpkg-dev libcc1-0 libdpkg-perl libportaudiocpp0"
+
+RUN apt-get update -y && \
+    apt-get -y install --no-install-recommends $RUNTIME_PACKAGES && \
+    apt-get -y install --no-install-recommends $BUILD_PACKAGES && \
+    pip3 install flask && \
     git clone https://github.com/Olga-Yakovleva/RHVoice.git /opt/RHVoice && \
     cd /opt/RHVoice && git checkout ee8be30 && scons && scons install && ldconfig && \
     git clone https://github.com/vantu5z/RHVoice-dictionary.git /opt/RHVoice-dictionary && \
-    mkdir -p /usr/local/etc/RHVoice/dicts/Russian/ && \
-    mkdir -p /opt/data && \
+    mkdir -p /usr/local/etc/RHVoice/dicts/Russian/ && mkdir -p /opt/data && \
     cp /opt/RHVoice-dictionary/*.txt /usr/local/etc/RHVoice/dicts/Russian/ && \
     cp -R /opt/RHVoice-dictionary/tools /opt/ && \
-    pip3 install flask pymorphy2 && \
-    cd /opt && rm -rf /opt/RHVoice && \
-    apt-get purge -y build-essential scons pkg-config binutils bzip2 cpp cpp-5 dpkg-dev g++ g++-5 gcc gcc-5 libdpkg-perl libgcc-5-dev libstdc++-5-dev make uuid-dev
+    cd /opt && rm -rf /opt/RHVoice /opt/RHVoice-dictionary && \
+    apt-get remove --purge -y $BUILD_PACKAGES $REMOVE_ME $(apt-mark showauto) && \
+    apt-get autoremove -y && \
+    apt-get -y install --no-install-recommends $RUNTIME_PACKAGES && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp
 
 ENV LC_ALL ru_RU.UTF-8
 ENV LANG ru_RU.UTF-8
