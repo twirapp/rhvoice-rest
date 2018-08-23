@@ -29,7 +29,7 @@ echo 'WantedBy=multi-user.target'
 } > /etc/systemd/system/rhvoice-rest.service
 
 git clone https://github.com/Olga-Yakovleva/RHVoice.git /opt/RHVoice
-cd /opt/RHVoice && git checkout ee8be30 && scons && scons install && ldconfig
+cd /opt/RHVoice && git checkout dc36179 && scons && scons install && ldconfig
 
 git clone https://github.com/vantu5z/RHVoice-dictionary.git /opt/RHVoice-dictionary && \
 mkdir -p /usr/local/etc/RHVoice/dicts/Russian/ && mkdir -p /opt/data && \
