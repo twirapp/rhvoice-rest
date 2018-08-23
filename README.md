@@ -48,14 +48,16 @@ rhvoice-rest
 `text` - URL-encoded строка. Обязательный параметр.
 
 `voice` - голос из RHVoice (полный список https://github.com/Olga-Yakovleva/RHVoice/wiki/Latest-version-%28Russian%29).
-Если не заданно то используется `anna`. Не все голоса могут читать русский.
+Если не заданно то используется `anna`. Если указанный голос не поддерживает язык текста вернет 500.
 
 `format` - Формат возвращаемого файла. Если не задано вернет `mp3`.
 
 ## Проверка
 <http://localhost:8080/say?text=Привет>
 
-<http://localhost:8080/say?text=Привет%28еще%28раз&format=opus>
+<http://localhost:8080/say?text=Привет%20еще%20раз&format=opus>
+
+<http://localhost:8080/say?text=Kaj%20mi%20ankaŭ%20parolas%20Esperanton&voice=spomenka&format=opus>
 
 ## Интеграция
 - Home Assistant https://github.com/mgarmash/ha-rhvoice-tts
