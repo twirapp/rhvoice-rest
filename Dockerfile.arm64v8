@@ -1,16 +1,12 @@
 FROM arm64v8/ubuntu:bionic
 
-ARG RUNTIME_PACKAGES="ca-certificates lame libao-common libao4 libasound2 libasound2-data libexpat1 libflac8 \
-libjack-jackd2-0 libmp3lame0 libmpdec2 libogg0 libopus0 libpcap0.8 libportaudio2 libpython3-stdlib \
-libpython3.6-minimal libpython3.6-stdlib libreadline7 libsamplerate0 libsndfile1 libsqlite3-0 libssl1.1 libvorbis0a \
-libvorbisenc2 locales mime-support multiarch-support openssl opus-tools python-pip-whl python3 \
-python3-distutils python3-lib2to3 python3-minimal python3-pip python3-pkg-resources python3-setuptools python3.6 \
-python3.6-minimal readline-common"
-ARG BUILD_PACKAGES="git scons build-essential libao-dev pkg-config flite1-dev libao-dev portaudio19-dev"
+ARG RUNTIME_PACKAGES="libao4 libasound2 libportaudio2 lame python3 python3-pip python3-setuptools locales opus-tools"
+ARG BUILD_PACKAGES="git scons build-essential libao-dev pkg-config flite1-dev portaudio19-dev"
 ARG REMOVE_ME="dpkg-dev libcc1-0 libdpkg-perl libportaudiocpp0"
 
 RUN apt-get update -y && \
     apt-get -y install --no-install-recommends $RUNTIME_PACKAGES && \
+    apt-mark manual $(apt-mark showauto) && \
     apt-get -y install --no-install-recommends $BUILD_PACKAGES && \
     cd /usr/share/locale/ && ls | grep -v 'ru\|en\|eo\|ka_\|ky\|tt\|uk\|locale.alias' | xargs rm -rf && \
     cat /etc/locale.gen | grep '# ru\|# en_US\|# eo\|# ka_\|# ky\|# tt\|# uk\|FALSE' | sed -e 's/# //g' > /tmp/locale.gen && \
