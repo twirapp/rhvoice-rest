@@ -5,12 +5,13 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
-PACKAGES="git scons build-essential libao4 libao-dev pkg-config flite1-dev libao-dev portaudio19-dev opus-tools lame \
-python3 python3-pip python3-setuptools locales locales-all"
+RUNTIME_PACKAGES="libao4 libasound2 libportaudio2 lame python3 python3-pip python3-setuptools locales opus-tools \
+locales-all"
+BUILD_PACKAGES="git scons build-essential libao-dev pkg-config flite1-dev portaudio19-dev"
 
 
 apt-get update -y
-apt-get -y install --no-install-recommends ${PACKAGES}
+apt-get -y install --no-install-recommends ${RUNTIME_PACKAGES} ${BUILD_PACKAGES}
 sudo -H python3 -m pip install --upgrade pip setuptools wheel
 sudo -H pip3 install flask pymorphy2
 
