@@ -11,7 +11,8 @@ python3 python3-pip python3-setuptools locales locales-all"
 
 apt-get update -y
 apt-get -y install --no-install-recommends ${PACKAGES}
-pip3 install flask pymorphy2
+sudo -H python3 -m pip install --upgrade pip setuptools wheel
+sudo -H pip3 install flask pymorphy2
 
 cp app.py /opt/rhvoice-rest.py
 chmod +x /opt/rhvoice-rest.py
