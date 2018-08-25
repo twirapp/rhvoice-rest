@@ -21,7 +21,7 @@ SUPPORT_VOICES = {
 DEFAULT_VOICE = 'anna'
 
 FORMATS = {
-    'mp3':  ['echo {text} | RHVoice-test -p {voice} -o - | lame -h -V 4 - -',           'audio/mpeg'],
+    'mp3':  ['echo {text} | RHVoice-test -p {voice} -o - | lame -h -V 4 -t - -',        'audio/mpeg'],
     'wav':  ['echo {text} | RHVoice-test -p {voice} -o -',                              'audio/wav'],
     'opus': ['echo {text} | RHVoice-test -p {voice} -o - | opusenc --ignorelength - -', 'audio/ogg'],
 }
