@@ -8,9 +8,8 @@ RUN apt-get update -y && \
     apt-get -y install --no-install-recommends $RUNTIME_PACKAGES && \
     apt-mark manual $(apt-mark showauto) && \
     apt-get -y install --no-install-recommends $BUILD_PACKAGES && \
-    cd /usr/share/locale/ && ls | grep -v 'ru\|en\|eo\|ka_\|ky\|tt\|uk\|locale.alias' | xargs rm -rf && \
-    cat /etc/locale.gen | grep '# ru\|# en_US\|# eo\|# ka_\|# ky\|# tt\|# uk\|FALSE' | sed -e 's/# //g' > /tmp/locale.gen && \
-    mv /tmp/locale.gen /etc/ && locale-gen --purge --no-archive && \
+    cd /usr/share/locale/ && ls | grep -v 'ru\|en\|locale.alias' | xargs rm -rf && \
+    locale-gen ru_RU.UTF-8 && \
     pip3 install flask pymorphy2 && \
     git clone https://github.com/Olga-Yakovleva/RHVoice.git /opt/RHVoice && \
     cd /opt/RHVoice && git checkout dc36179 && scons && scons install && ldconfig && \
