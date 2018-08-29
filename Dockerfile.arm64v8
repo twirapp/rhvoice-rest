@@ -1,3 +1,4 @@
+# docker build -t aculeasis/rhvoice-rest:arm64v8 -f Dockerfile.arm64v8 .
 FROM arm64v8/ubuntu:bionic
 
 ARG RUNTIME_PACKAGES="libao4 libasound2 libportaudio2 lame python3 python3-pip python3-setuptools locales opus-tools"
