@@ -29,10 +29,11 @@ ENV LC_ALL ru_RU.UTF-8
 ENV LANG ru_RU.UTF-8
 ENV LANGUAGE ru_RU.UTF-8
 
+ADD entrypoint.sh /opt/entrypoint.sh
 ADD app.py /opt/app.py
 
 EXPOSE 8080/tcp
 
 VOLUME ["/usr/local/etc/RHVoice"]
 
-CMD python3 /opt/app.py
+ENTRYPOINT ["/bin/bash", "/opt/entrypoint.sh"]
