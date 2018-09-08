@@ -3,6 +3,13 @@ rhvoice-rest
 Это проект на основе синтезатора речи https://github.com/Olga-Yakovleva/RHVoice
 
 ## Установка
+###Быстрый старт
+
+Запуск\обновление из хаба: `./rhvoice_rest.py --upgrade`
+
+Полное описание [тут](https://github.com/Aculeasis/docker-starter)
+
+PS: Т.к. готовых образов для armv7l нет их можно только собрать добавив ключь `-b`
 
 ### Готовый докер
 На aarch64 (Например Orange Pi Prime и прочие H5):
@@ -13,7 +20,7 @@ rhvoice-rest
 
 `docker run -d -p 8080:8080 aculeasis/rhvoice-rest:amd64`
 
-Конфигурация по-умолчанию, можно смонтировать `/usr/local/etc/RHVoice/` и подложить свой конфиг.
+Чтобы не терять настройки при обновленях, нужно вынести на хост (через -v): `/opt/cfg`
 
 ### Сборка и запуск докера
     git clone https://github.com/Aculeasis/rhvoice-rest
