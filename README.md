@@ -3,7 +3,7 @@ rhvoice-rest
 Это проект на основе синтезатора речи https://github.com/Olga-Yakovleva/RHVoice
 
 ## Установка
-###Быстрый старт
+### Быстрый старт
 
 Запуск\обновление из хаба: `./rhvoice_rest.py --upgrade`
 
