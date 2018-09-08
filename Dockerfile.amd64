@@ -19,6 +19,7 @@ RUN apt-get update -y && \
     cp /opt/RHVoice-dictionary/*.txt /usr/local/etc/RHVoice/dicts/Russian/ && \
     cp -R /opt/RHVoice-dictionary/tools /opt/ && \
     cd /opt && rm -rf /opt/RHVoice /opt/RHVoice-dictionary && \
+    mkdir /opt/cfg && \
     apt-get remove --purge -y $BUILD_PACKAGES $REMOVE_ME $(apt-mark showauto) && \
     apt-get autoremove -y && \
     apt-get -y install --no-install-recommends $RUNTIME_PACKAGES && \
@@ -33,7 +34,5 @@ ADD entrypoint.sh /opt/entrypoint.sh
 ADD app.py /opt/app.py
 
 EXPOSE 8080/tcp
-
-VOLUME ["/usr/local/etc/RHVoice"]
 
 ENTRYPOINT ["/bin/bash", "/opt/entrypoint.sh"]
