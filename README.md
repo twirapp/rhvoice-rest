@@ -1,5 +1,7 @@
 rhvoice-rest
 ============
+[![Docker Pulls](https://img.shields.io/docker/pulls/aculeasis/rhvoice-rest.svg)](https://hub.docker.com/r/aculeasis/rhvoice-rest/)
+
 Это проект на основе синтезатора речи https://github.com/Olga-Yakovleva/RHVoice
 
 ## Установка
