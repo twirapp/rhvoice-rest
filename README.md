@@ -9,16 +9,12 @@ rhvoice-rest
 
 Полное описание [тут](https://github.com/Aculeasis/docker-starter)
 
-PS: Т.к. готовых образов для armv7l нет их можно только собрать добавив ключь `-b`
-
 ### Готовый докер
 На aarch64 (Например Orange Pi Prime и прочие H5):
 
-`docker run -d -p 8080:8080 aculeasis/rhvoice-rest:arm64v8`
-
-На обычной x86_64:
-
-`docker run -d -p 8080:8080 aculeasis/rhvoice-rest:amd64`
+- aarch64 `docker run -d -p 8080:8080 aculeasis/rhvoice-rest:arm64v8`
+- armv7l `docker run -d -p 8080:8080 aculeasis/rhvoice-rest:arm32v7`
+- x86_64 `docker run -d -p 8080:8080 aculeasis/rhvoice-rest:amd64`
 
 Чтобы не терять настройки при обновленях, нужно вынести на хост (через -v): `/opt/cfg`
 
