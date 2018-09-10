@@ -2,7 +2,7 @@ rhvoice-rest
 ============
 [![Docker Pulls](https://img.shields.io/docker/pulls/aculeasis/rhvoice-rest.svg)](https://hub.docker.com/r/aculeasis/rhvoice-rest/)
 
-Это проект на основе синтезатора речи https://github.com/Olga-Yakovleva/RHVoice
+Это проект на основе синтезатора речи [RHVoice](https://github.com/Olga-Yakovleva/RHVoice)
 
 ## Установка
 ### Быстрый старт
@@ -52,7 +52,7 @@ rhvoice-rest
 
 `text` - URL-encoded строка. Обязательный параметр.
 
-`voice` - голос из RHVoice (полный список https://github.com/Olga-Yakovleva/RHVoice/wiki/Latest-version-%28Russian%29).
+`voice` - голос из RHVoice [полный список](https://github.com/Olga-Yakovleva/RHVoice/wiki/Latest-version-%28Russian%29).
 Если не заданно то используется `anna`. Если указанный голос не поддерживает язык текста вернет 500.
 
 `format` - Формат возвращаемого файла. Если не задано вернет `mp3`.
