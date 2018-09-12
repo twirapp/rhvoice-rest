@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
 import subprocess
-from io import BytesIO
 from shlex import quote
 from urllib import parse
 
-from flask import Flask, request, send_file, make_response, abort
+from flask import Flask, request, make_response, Response, stream_with_context
 
 from tools.preprocessing.text_prepare import text_prepare
 
@@ -32,6 +31,14 @@ app = Flask(__name__, static_url_path='')
 
 @app.route('/say')
 def say():
+    def stream_():
+        with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).stdout as fp:
+            while fp.readable():
+                data = fp.read(2048)
+                if not data:
+                    break
+                yield data
+
     text = request.args.get('text', '')
     voice = request.args.get('voice', DEFAULT_VOICE)
     format_ = request.args.get('format', DEFAULT_FORMAT)
@@ -44,16 +51,8 @@ def say():
         return make_response('Unset \'text\'.', 400)
 
     text = quote(text_prepare(parse.unquote(text).replace('\r\n', ' ').replace('\n', ' ')))
-    run = subprocess.run(
-        FORMATS[format_][0].format(text=text, voice=voice),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        shell=True
-    )
-    if len(run.stdout) > 42:  # any size
-        return send_file(filename_or_fp=BytesIO(run.stdout), mimetype=FORMATS[format_][1])
-    else:
-        abort(500)
+    cmd = FORMATS[format_][0].format(text=text, voice=voice), FORMATS[format_][1]
+    return Response(stream_with_context(stream_()), mimetype=FORMATS[format_][1])
 
 
 if __name__ == "__main__":
