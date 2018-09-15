@@ -29,8 +29,9 @@ tts = TTS()
 @app.route('/say')
 def say():
     def stream_():
-        for chunk in tts.say(text, voice, format_):
-            yield chunk
+        with tts.say(text, voice, format_) as read:
+            for chunk in read:
+                yield chunk
 
     text = request.args.get('text', '')
     voice = request.args.get('voice', DEFAULT_VOICE)
