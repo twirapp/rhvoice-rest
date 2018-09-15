@@ -30,8 +30,9 @@ ENV LC_ALL ru_RU.UTF-8
 ENV LANG ru_RU.UTF-8
 ENV LANGUAGE ru_RU.UTF-8
 
-ADD entrypoint.sh /opt/entrypoint.sh
-ADD app.py /opt/app.py
+COPY entrypoint.sh /opt/entrypoint.sh
+COPY app.py /opt/app.py
+COPY rhvoice_proxy/rhvoice*.py /opt/rhvoice_proxy/
 
 EXPOSE 8080/tcp
 

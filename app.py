@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-import subprocess
 from shlex import quote
 from urllib import parse
 
 from flask import Flask, request, make_response, Response, stream_with_context
 
+from rhvoice_proxy.rhvoice import TTS
 from tools.preprocessing.text_prepare import text_prepare
 
 SUPPORT_VOICES = {
@@ -19,25 +19,18 @@ SUPPORT_VOICES = {
 }
 DEFAULT_VOICE = 'anna'
 
-FORMATS = {
-    'mp3':  ['echo {text} | RHVoice-test -p {voice} -o - | lame -h -V 4 -t - -',        'audio/mpeg'],
-    'wav':  ['echo {text} | RHVoice-test -p {voice} -o -',                              'audio/wav'],
-    'opus': ['echo {text} | RHVoice-test -p {voice} -o - | opusenc --ignorelength - -', 'audio/ogg'],
-}
+FORMATS = {'mp3': 'audio/mpeg', 'wav': 'audio/wav', 'opus': 'audio/ogg'}
 DEFAULT_FORMAT = 'mp3'
 
 app = Flask(__name__, static_url_path='')
+tts = TTS()
 
 
 @app.route('/say')
 def say():
     def stream_():
-        with subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True).stdout as fp:
-            while fp.readable():
-                data = fp.read(2048)
-                if not data:
-                    break
-                yield data
+        for chunk in tts.say(text, voice, format_):
+            yield chunk
 
     text = request.args.get('text', '')
     voice = request.args.get('voice', DEFAULT_VOICE)
@@ -51,9 +44,8 @@ def say():
         return make_response('Unset \'text\'.', 400)
 
     text = quote(text_prepare(parse.unquote(text).replace('\r\n', ' ').replace('\n', ' ')))
-    cmd = FORMATS[format_][0].format(text=text, voice=voice), FORMATS[format_][1]
-    return Response(stream_with_context(stream_()), mimetype=FORMATS[format_][1])
+    return Response(stream_with_context(stream_()), mimetype=FORMATS[format_])
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8080, threaded=False)
