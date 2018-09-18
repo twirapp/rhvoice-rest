@@ -15,6 +15,8 @@ apt-get -y install --no-install-recommends ${RUNTIME_PACKAGES} ${BUILD_PACKAGES}
 sudo -H python3 -m pip install --upgrade pip setuptools wheel
 sudo -H pip3 install flask pymorphy2
 
+mkdir -p /opt/rhvoice_proxy
+cp rhvoice_proxy/rhvoice*.py /opt/rhvoice_proxy/
 cp app.py /opt/rhvoice-rest.py
 chmod +x /opt/rhvoice-rest.py
 
