@@ -33,7 +33,7 @@ def say():
             for chunk in read:
                 yield chunk
 
-    text = request.args.get('text', '')
+    text = ' '.join([x for x in parse.unquote(request.args.get('text', '')).splitlines() if x])
     voice = request.args.get('voice', DEFAULT_VOICE)
     format_ = request.args.get('format', DEFAULT_FORMAT)
 
@@ -44,7 +44,7 @@ def say():
     if not text:
         return make_response('Unset \'text\'.', 400)
 
-    text = quote(text_prepare(parse.unquote(text).replace('\r\n', ' ').replace('\n', ' ')))
+    text = quote(text_prepare(text))
     return Response(stream_with_context(stream_()), mimetype=FORMATS[format_])
 
 
