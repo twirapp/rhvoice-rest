@@ -66,7 +66,7 @@ rhvoice-rest
 
 ## Интеграция
 - Home Assistant https://github.com/mgarmash/ha-rhvoice-tts
-- Пример либы для питона https://github.com/Aculeasis/rhvoice-rest/blob/master/example/rhvoice-rest.py
+- [Примеры](https://github.com/Aculeasis/rhvoice-rest/tree/master/example)
 
 ## Links
 - https://github.com/Olga-Yakovleva/RHVoice
