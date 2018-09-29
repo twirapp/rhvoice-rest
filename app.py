@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 from shlex import quote
 from urllib import parse
 
@@ -23,7 +24,6 @@ FORMATS = {'mp3': 'audio/mpeg', 'wav': 'audio/wav', 'opus': 'audio/ogg'}
 DEFAULT_FORMAT = 'mp3'
 
 app = Flask(__name__, static_url_path='')
-tts = TTS()
 
 
 @app.route('/say')
@@ -48,5 +48,16 @@ def say():
     return Response(stream_with_context(stream_()), mimetype=FORMATS[format_])
 
 
+def get_threads():
+    try:
+        cont = int(os.environ.get('THREADED', 1))
+    except ValueError:
+        cont = 1
+    return cont if cont > 0 else 1
+
+
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8080, threaded=False)
+    threads = get_threads()
+    tts = TTS(threads=threads)
+    app.run(host='0.0.0.0', port=8080, threaded=threads > 1)
+    tts.join()
