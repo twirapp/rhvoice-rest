@@ -89,6 +89,6 @@ if __name__ == "__main__":
         DEFAULT_FORMAT = 'mp3'
     threads = get_threads()
     paths = get_path()
-    tts = TTS(cmd, threads=threads, lib_path=paths[0], data_path=paths[1], resources=paths[2])
+    (tts, SUPPORT_VOICES) = TTS(cmd, threads=threads, lib_path=paths[0], data_path=paths[1], resources=paths[2])
     app.run(host='0.0.0.0', port=8080, threaded=threads > 1)
     tts.join()
