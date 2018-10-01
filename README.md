@@ -34,6 +34,19 @@ rhvoice-rest
     sudo ./install.sh
 Статус сервиса `sudo systemctl status rhvoice-rest.service`
 
+### Запуск в Windows
+Не знаю зачем, но сервис можно запустить нативно. Для этого нужно как минимум собрать [RHVoice](https://github.com/Olga-Yakovleva/RHVoice), установить нужные language- и voice-пакеты (лучше сразу все) и задать пути через переменные окружения:
+- **RHVOICELIBPATH**: Путь до `RHVoice.dll` той же архитектуры что и питон
+- **RHVOICEDATAPATH**: Путь до папки с languages и voices. По умолчанию они ставятся в `C:\Program Files (x86)\RHVoice\data`
+
+Не обязательно:
+- **LAMEPATH**: Путь до `lame.exe`, для поддержки mp3
+- **OPUSENCPATH**: Путь до `opusenc.exe`, для поддержки opus
+
+и рядом с app.py положить `tools` из [RHVoice-dictionary](https://github.com/vantu5z/RHVoice-dictionary).
+
+Протестировано на Windows 10 и Python 3.6.
+
 #### Многопоточный режим
 Для включения запустите с переменной окружения `THREADED=N`, где `N` > 1. Будет запущено `N` процессов синтеза. Потребляет больше ресурсов.
 Рекомендуемое значение - не больше чем 1.5 * количество потоков CPU. Если многопоточный доступ не нужен, лучше не включать.
