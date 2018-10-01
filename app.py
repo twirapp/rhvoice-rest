@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import shutil
 from shlex import quote
 from urllib import parse
 
@@ -20,8 +21,8 @@ SUPPORT_VOICES = {
 }
 DEFAULT_VOICE = 'anna'
 
-FORMATS = {'mp3': 'audio/mpeg', 'wav': 'audio/wav', 'opus': 'audio/ogg'}
-DEFAULT_FORMAT = 'mp3'
+FORMATS = {'wav': 'audio/wav'}
+DEFAULT_FORMAT = 'wav'
 
 app = Flask(__name__, static_url_path='')
 
@@ -48,6 +49,32 @@ def say():
     return Response(stream_with_context(stream_()), mimetype=FORMATS[format_])
 
 
+def format_support():
+    base_cmd = {
+        'mp3': [['lame', '-htv', '--silent', '-', '-'], 'lame', 'audio/mpeg', 'LAMEPATH'],
+        'opus': [
+            ['opusenc', '--quiet', '--discard-comments', '--ignorelength', '-', '-'],
+            'opus-tools', 'audio/ogg', 'OPUSENCPATH'
+        ]
+    }
+    cmd_ = {}
+    formats = {'wav': 'audio/wav'}
+    for key, val in base_cmd.items():
+        bin_path = os.environ.get(val[3]) or val[0][0]
+        if shutil.which(bin_path):
+            cmd_[key] = val[0]
+            cmd_[key][0] = bin_path
+            formats[key] = val[2]
+        else:
+            print('Disable {} support - {} not found. Use apt install {}'.format(key, bin_path, val[1]))
+    return cmd_, formats
+
+
+def get_path():
+    variables = ['RHVOICELIBPATH', 'RHVOICEDATAPATH', 'RHVOICERESOURCES']
+    return [os.environ.get(x) for x in variables]
+
+
 def get_threads():
     try:
         cont = int(os.environ.get('THREADED', 1))
@@ -57,7 +84,11 @@ def get_threads():
 
 
 if __name__ == "__main__":
+    (cmd, FORMATS) = format_support()
+    if 'mp3' in FORMATS:
+        DEFAULT_FORMAT = 'mp3'
     threads = get_threads()
-    tts = TTS(threads=threads)
+    paths = get_path()
+    tts = TTS(cmd, threads=threads, lib_path=paths[0], data_path=paths[1], resources=paths[2])
     app.run(host='0.0.0.0', port=8080, threaded=threads > 1)
     tts.join()
