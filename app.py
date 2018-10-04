@@ -4,8 +4,8 @@ from shlex import quote
 from urllib import parse
 
 from flask import Flask, request, make_response, Response, stream_with_context
+from rhvoice_wrapper import TTS
 
-from rhvoice_proxy.rhvoice import TTS
 from tools.preprocessing.text_prepare import text_prepare
 
 SUPPORT_VOICES = {
