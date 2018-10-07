@@ -6,24 +6,18 @@ sudo:
   true
 before_install:
   - sudo apt-get update -y
-  - sudo apt-get -y install --no-install-recommends libao4 libasound2 libportaudio2 lame python3 python3-pip python3-setuptools locales opus-tools
+  - sudo apt-get -y install --no-install-recommends lame python3 locales opus-tools
   - locale-gen ru_RU.UTF-8
-  - sudo apt-get -y install --no-install-recommends scons build-essential libao-dev pkg-config flite1-dev portaudio19-dev
+  - sudo apt-get -y install --no-install-recommends scons build-essential python3-pip
 install:
   - pip install --upgrade pip setuptools wheel
-  - pip install flask aiohttp pymorphy2 rhvoice-wrapper
+  - pip install flask aiohttp pymorphy2 rhvoice-wrapper rhvoice-wrapper-bin
 before_script:
-  - git clone https://github.com/Olga-Yakovleva/RHVoice.git
-  - cd RHVoice
-  - git checkout dc36179
-  - scons
-  - sudo scons install
-  - sudo ldconfig
-  - cd ..
   - git clone https://github.com/vantu5z/RHVoice-dictionary.git
   - sudo mkdir -p /usr/local/etc/RHVoice/dicts/Russian/
   - sudo cp RHVoice-dictionary/*.txt /usr/local/etc/RHVoice/dicts/Russian/
   - cp -R RHVoice-dictionary/tools .
+  - export LD_LIBRARY_PATH=$(pip show rhvoice-wrapper-bin | grep Location | awk '{print $2}')/rhvoice_wrapper_bin/lib/
   - python app.py &
   - sleep 5
 script:
