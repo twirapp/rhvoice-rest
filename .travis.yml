@@ -20,15 +20,19 @@ addons:
 
 before_install:
   - docker --version
-  - pip install aiohttp
   - docker build -t aculeasis/rhvoice-rest-test:amd64 -f Dockerfile.amd64 .
-  - docker run -d -p 8080:8080 --name rhvoice-rest aculeasis/rhvoice-rest-test:amd64 -e THREADED=6
-  - docker ps -a
+  - docker run -d -p 8080:8080 -e THREADED=6 --name rhvoice-rest aculeasis/rhvoice-rest-test:amd64
   - sleep 5
+  - docker ps images
+  - docker ps -a
+
+install:
+  - pip install aiohttp
 
 script:
   - python -u example/threaded_test.py
 
 after_script:
+  - docker logs rhvoice-rest
   - docker stop rhvoice-rest
   - docker ps -a
