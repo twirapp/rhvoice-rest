@@ -1,19 +1,31 @@
 language:
   python
-python:
-  '3.6'
+
+matrix:
+  include:
+  - python: '3.4'
+  - python: '3.6'
+  - python: '3.7'
+  allow_failures:
+    - python: '3.4'
+    - python: '3.7'
+
 sudo:
   true
+
+git:
+  depth: 1
+
 before_install:
   - sudo apt-get update -y
-  - sudo apt-get -y install --no-install-recommends lame python3 locales opus-tools
+  - sudo apt-get -y install --no-install-recommends lame python3 opus-tools
   - locale-gen ru_RU.UTF-8
-  - sudo apt-get -y install --no-install-recommends scons build-essential python3-pip
+  - sudo apt-get -y install --no-install-recommends scons build-essential
 install:
-  - pip install --upgrade pip setuptools wheel
+  - pip install --upgrade setuptools wheel
   - pip install flask aiohttp pymorphy2 rhvoice-wrapper rhvoice-wrapper-bin
 before_script:
-  - git clone https://github.com/vantu5z/RHVoice-dictionary.git
+  - git clone --depth=1 https://github.com/vantu5z/RHVoice-dictionary.git
   - sudo mkdir -p /usr/local/etc/RHVoice/dicts/Russian/
   - sudo cp RHVoice-dictionary/*.txt /usr/local/etc/RHVoice/dicts/Russian/
   - cp -R RHVoice-dictionary/tools .
@@ -22,3 +34,6 @@ before_script:
   - sleep 5
 script:
   - python -u example/threaded_test.py
+
+after_script:
+  - kill -TERM "$(pgrep 'python' -a | grep 'app.py' | awk '{print $1}')"
