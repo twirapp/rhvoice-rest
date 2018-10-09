@@ -23,7 +23,7 @@ before_install:
   - docker build -t aculeasis/rhvoice-rest-test:amd64 -f Dockerfile.amd64 .
   - docker run -d -p 8080:8080 -e THREADED=6 --name rhvoice-rest aculeasis/rhvoice-rest-test:amd64
   - sleep 5
-  - docker ps images
+  - docker images
   - docker ps -a
 
 install:
