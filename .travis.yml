@@ -13,7 +13,13 @@ sudo:
 git:
   depth: 1
 
+addons:
+  apt:
+    packages:
+      - docker-ce
+
 before_install:
+  - docker --version
   - pip install aiohttp
   - docker build -t aculeasis/rhvoice-rest-test:arm64v8 -f Dockerfile.arm64v8 .
   - docker run -d -p 8080:8080 --name rhvoice-rest aculeasis/rhvoice-rest-test:arm64v8 -e THREADED=6
