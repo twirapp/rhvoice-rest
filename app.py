@@ -16,13 +16,14 @@ DEFAULT_FORMAT = 'mp3'
 app = Flask(__name__, static_url_path='')
 
 
+def direct_stream(text, voice, format_, sets):
+    with tts.say(text, voice, format_, sets=sets or None) as read:
+        for chunk in read:
+            yield chunk
+
+
 @app.route('/say')
 def say():
-    def stream_():
-        with tts.say(text, voice, format_) as read:
-            for chunk in read:
-                yield chunk
-
     text = ' '.join([x for x in parse.unquote(request.args.get('text', '')).splitlines() if x])
     voice = request.args.get('voice', DEFAULT_VOICE)
     format_ = request.args.get('format', DEFAULT_FORMAT)
@@ -35,7 +36,20 @@ def say():
         return make_response('Unset \'text\'.', 400)
 
     text = quote(text_prepare(text))
-    return Response(stream_with_context(stream_()), mimetype=FORMATS[format_])
+    sets = _get_sets(request.args)
+    return Response(stream_with_context(direct_stream(text, voice, format_, sets)), mimetype=FORMATS[format_])
+
+
+def _normalize_set(val):  # 0..100 -> -1.0..1
+    try:
+        return max(0, min(100, int(val)))/50.0-1
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _get_sets(args):
+    keys = {'rate': 'absolute_rate', 'pitch': 'absolute_pitch', 'volume': 'absolute_volume'}
+    return {keys[key]: _normalize_set(args[key]) for key in keys if key in args}
 
 
 def _get_def(any_, test):
