@@ -8,15 +8,6 @@ from rhvoice_wrapper import TTS
 
 from tools.preprocessing.text_prepare import text_prepare
 
-SUPPORT_VOICES = {
-    'aleksandr', 'anna', 'elena', 'irina',  # Russian
-    'alan', 'bdl', 'clb', 'slt',  # English
-    'spomenka',  # Esperanto
-    'natia',  # Georgian
-    'azamat', 'nazgul',  # Kyrgyz
-    'talgat',  # Tatar
-    'anatol', 'natalia'  # Ukrainian
-}
 DEFAULT_VOICE = 'anna'
 
 FORMATS = {'wav': 'audio/wav', 'mp3': 'audio/mpeg', 'opus': 'audio/ogg'}
