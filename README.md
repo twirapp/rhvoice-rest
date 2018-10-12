@@ -5,6 +5,7 @@
 Это веб-сервис на основе flask и синтезатора речи [RHVoice](https://github.com/Olga-Yakovleva/RHVoice). Благодаря REST API его легко интегрировать в качестве TTS-провайдера.
 
 ## Docker
+### Через скрипт docker_starter
 Запуск\обновление из хаба: `./rhvoice_rest.py --upgrade`
 
 Полное описание [тут](https://github.com/Aculeasis/docker-starter)
@@ -54,17 +55,19 @@
 `volume` - Громкость голоса. По умолчанию `50`.
 
 ## Нативный запуск
-Для начала нужно установить `rhvoice-wrapper`:
+Для начала нужно установить [rhvoice-wrapper](https://github.com/Aculeasis/rhvoice-proxy):
 
 `pip3 install rhvoice-wrapper>=0.3.0`
 
-Собрать и установить [RHVoice](https://github.com/Olga-Yakovleva/RHVoice) или установить `rhvoice-wrapper-bin` предоставляющий библиотеки и данные RHVoice. Второй вариант рекомендуется для Windows т.к. не требует сборки и установки путей. Для запуска с `rhvoice-wrapper-bin` в Linux нужно добавить в `LD_LIBRARY_PATH` путь до разделяемых библиотек, например так:
+Собрать и установить [RHVoice](https://github.com/Olga-Yakovleva/RHVoice) или установить [rhvoice-wrapper-bin](https://github.com/Aculeasis/rhvoice-wrapper-bin) предоставляющий библиотеки и данные RHVoice. Второй вариант рекомендуется для Windows т.к. не требует сборки и установки путей. Для запуска с `rhvoice-wrapper-bin` в Linux нужно добавить в `LD_LIBRARY_PATH` путь до разделяемых библиотек, например так:
 ```bash
 pip3 install rhvoice-wrapper-bin
 export LD_LIBRARY_PATH=$(pip3 show rhvoice-wrapper-bin | grep Location | awk '{print $2}')/rhvoice_wrapper_bin/lib/
 python3 -u app.py
 ```
 И еще рядом с app.py положить `tools` из [RHVoice-dictionary](https://github.com/vantu5z/RHVoice-dictionary).
+
+Для поддержки `mp3` и `opus` нужно установить `lame` и `opus-tools`
 
 ### Устновка скриптом на debian-based дистрибутивах в качестве сервиса
     git clone https://github.com/Aculeasis/rhvoice-rest
