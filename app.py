@@ -121,8 +121,8 @@ class CacheLifeTime(threading.Thread):
 
     def join(self, timeout=None):
         if self._run:
-            self._wait.set()
             self._run = False
+            self._wait.set()
             super().join(timeout)
 
     def run(self):
