@@ -1,6 +1,9 @@
 language:
   python
 
+env:
+  - RHVOICE_FCACHE_LIFETIME=12
+
 matrix:
   include:
   - python: '3.6'
