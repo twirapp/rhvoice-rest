@@ -117,6 +117,7 @@ class CacheLifeTime(threading.Thread):
             self._lifetime = lifetime
             self._path = cache_path
             self._wait = threading.Event()
+            self._run = True
             self.start()
 
     def join(self, timeout=None):
@@ -126,7 +127,6 @@ class CacheLifeTime(threading.Thread):
             super().join(timeout)
 
     def run(self):
-        self._run = True
         print('Cache lifetime: {} hours'.format(self._lifetime))
         self._lifetime *= 60 * 60
         while self._run:
