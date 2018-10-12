@@ -5,6 +5,8 @@ import os
 import shutil
 import sys
 import tempfile
+import threading
+import time
 from shlex import quote
 from urllib import parse
 
@@ -101,10 +103,52 @@ def _cache_enable():
         return os.path.join(os.path.abspath(sys.path[0]), 'rhvoice_rest_cache')
 
 
+class CacheLifeTime(threading.Thread):
+    def __init__(self, cache_path, lifetime=None):
+        self._run = False
+        try:
+            if lifetime is None:
+                lifetime = int(os.environ.get('RHVOICE_FCACHE_LIFETIME', 0))
+        except (TypeError, ValueError):
+            lifetime = 0
+        if lifetime and cache_path:
+            super().__init__()
+            self._check_interval = 60 * 60
+            self._lifetime = lifetime
+            self._path = cache_path
+            self._wait = threading.Event()
+            self.start()
+
+    def join(self, timeout=None):
+        if self._run:
+            self._wait.set()
+            self._run = False
+            super().join(timeout)
+
+    def run(self):
+        self._run = True
+        print('Cache lifetime: {} minutes'.format(self._lifetime))
+        self._lifetime *= 60
+        while self._run:
+            current_time = time.time()
+            for file in os.listdir(self._path):
+                file_path = os.path.join(self._path, file)
+                if os.path.isfile(file_path):
+                    last_read = os.path.getatime(file_path)
+                    diff = current_time - last_read
+                    if diff > self._lifetime:
+                        try:
+                            os.remove(file_path)
+                        except OSError as e:
+                            print('Error deleting {}: {}'.format(file_path, e))
+            self._wait.wait(self._check_interval)
+
+
 if __name__ == "__main__":
     tts = TTS()
 
     CACHE_DIR = _cache_enable()
+    cache_lifetime = CacheLifeTime(cache_path=CACHE_DIR)
 
     formats = tts.formats
     DEFAULT_FORMAT = _get_def(formats, DEFAULT_FORMAT)
@@ -115,4 +159,5 @@ if __name__ == "__main__":
     SUPPORT_VOICES = set(SUPPORT_VOICES)
 
     app.run(host='0.0.0.0', port=8080, threaded=tts.thread_count > 1)
+    cache_lifetime.join()
     tts.join()
