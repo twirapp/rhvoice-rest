@@ -4,15 +4,12 @@
 
 Это веб-сервис на основе flask и синтезатора речи [RHVoice](https://github.com/Olga-Yakovleva/RHVoice). Благодаря REST API его легко интегрировать в качестве TTS-провайдера.
 
-## Установка
-### Быстрый старт
-
+## Docker
 Запуск\обновление из хаба: `./rhvoice_rest.py --upgrade`
 
 Полное описание [тут](https://github.com/Aculeasis/docker-starter)
 
 ### Готовые докеры
-
 - aarch64 `docker run -d -p 8080:8080 aculeasis/rhvoice-rest:arm64v8`
 - armv7l `docker run -d -p 8080:8080 aculeasis/rhvoice-rest:arm32v7`
 - x86_64 `docker run -d -p 8080:8080 aculeasis/rhvoice-rest:amd64`
@@ -23,31 +20,7 @@
     # Указать Dockerfile под целевую архитектуру
     docker build -t rhvoice-rest -f Dockerfile.arm64v8 .
     docker run -d -p 8080:8080 rhvoice-rest
-
-### Устновка скриптом на debian-based дистрибутивах в качестве сервиса
-    git clone https://github.com/Aculeasis/rhvoice-rest
-    cd rhvoice-rest
-    chmod +x install.sh
-    sudo ./install.sh
-Статус сервиса `sudo systemctl status rhvoice-rest.service`
-
-### Запуск в Windows
-Не знаю зачем, но сервис можно запустить нативно. Для этого нужно как минимум собрать [RHVoice](https://github.com/Olga-Yakovleva/RHVoice), установить нужные language- и voice-пакеты (лучше сразу все) и задать пути через переменные окружения:
-- **RHVOICELIBPATH**: Путь до `RHVoice.dll` той же архитектуры что и питон
-- **RHVOICEDATAPATH**: Путь до папки с languages и voices. По умолчанию они ставятся в `C:\Program Files (x86)\RHVoice\data`
-
-Не обязательно:
-- **LAMEPATH**: Путь до `lame.exe`, для поддержки mp3
-- **OPUSENCPATH**: Путь до `opusenc.exe`, для поддержки opus
-
-и рядом с app.py положить `tools` из [RHVoice-dictionary](https://github.com/vantu5z/RHVoice-dictionary).
-
-Протестировано на Windows 10 и Python 3.6.
-
-#### Многопоточный режим
-Для включения запустите с переменной окружения `THREADED=N`, где `N` > 1. Будет запущено `N` процессов синтеза. Потребляет больше ресурсов.
-Рекомендуемое значение - не больше чем 1.5 * количество потоков CPU. Если многопоточный доступ не нужен, лучше не включать.
-
+    
 ## API
     http://SERVER/say?
     text=<текст>
@@ -79,6 +52,46 @@
 `pitch` - Высота голоса. По умолчанию `50`.
 
 `volume` - Громкость голоса. По умолчанию `50`.
+
+## Нативный запуск
+Для начала нужно установить `rhvoice-wrapper`:
+
+`pip3 install rhvoice-wrapper>=0.3.0`
+
+Собрать и установить [RHVoice](https://github.com/Olga-Yakovleva/RHVoice) или установить `rhvoice-wrapper-bin` предоставляющий библиотеки и данные RHVoice. Второй вариант рекомендуется для Windows т.к. не требует сборки и установки путей. Для запуска с `rhvoice-wrapper-bin` в Linux нужно добавить в `LD_LIBRARY_PATH` путь до разделяемых библиотек, например так:
+```bash
+pip3 install rhvoice-wrapper-bin
+export LD_LIBRARY_PATH=$(pip3 show rhvoice-wrapper-bin | grep Location | awk '{print $2}')/rhvoice_wrapper_bin/lib/
+python3 -u app.py
+```
+И еще рядом с app.py положить `tools` из [RHVoice-dictionary](https://github.com/vantu5z/RHVoice-dictionary).
+
+### Устновка скриптом на debian-based дистрибутивах в качестве сервиса
+    git clone https://github.com/Aculeasis/rhvoice-rest
+    cd rhvoice-rest
+    chmod +x install.sh
+    sudo ./install.sh
+Статус сервиса `sudo systemctl status rhvoice-rest.service`
+
+### Особенности запуска в Windows
+Нужно задать пути через переменные окружения. Если вы используете `rhvoice-wrapper-bin` то первые 2 задавать не нужно:
+
+**RHVOICELIBPATH** до `RHVoice.dll` той же архитектуры что и питон и **RHVOICEDATAPATH** до папки с languages и voices. По умолчанию они ставятся в `C:\Program Files (x86)\RHVoice\data`
+
+Не обязательно: **LAMEPATH** до `lame.exe` для поддержки `mp3` и **OPUSENCPATH** до `opusenc.exe` для поддержки `opus`. Возможно, использование `opusenc.exe` может вызывать переполнение буфера и зависание процесса синтеза. В Linux проблем не замечено.
+
+Протестировано на Windows 10 и Python 3.6.
+
+## Настройки
+Все настройки задаются через переменные окружения, до запуска скрипта или при создании докера (через `-e`):
+- **RHVOICELIBPATH**: Путь до библиотеки RHVoice. По умолчанию `RHVoice.dll` в Windows и `libRHVoice.so` в Linux.
+- **RHVOICEDATAPATH**:  Путь до данных RHVoice. По умолчанию `/usr/local/share/RHVoice`.
+- **RHVOICERESOURCES**: Путь до неких ресурсов, я не знаю что это. По умолчанию `/usr/local/etc/RHVoice/dicts/Russian/`.
+- **THREADED**: Количество запущенных процессов синтеза, определяет количество запросов которые могут быть обработаны одновременно. Если `> 1` генеработы будут запущены в качестве отдельных процессов что существенно увеличит потребление памяти. Рекомендуемое максимальное значение `1.5 * core count`. По умолчанию `1`.
+- **LAMEPATH**: Путь до `lame` или `lame.exe`, если файл не найден поддержка `mp3` будет отключена. По умолчанию `lame`.
+- **OPUSENCPATH**: Путь до `opusenc` или `opusenc.exe`, если файл не найден поддержка `opus` будет отключена. По умолчанию `opusenc`.
+- **RHVOICE_FCACHE**: Если задано и не равно `no`, `disable` или `false` будет включен файловый кэш. Чтение из кэша почти не увеличивает скорость реакции, но значительно уменьшает время загрузки всех данных. Может некорректно работать в Windows. По умолчанию кэш отключен.
+- **RHVOICE_FCACHE_LIFETIME**: Если кэш включен задает время жизни файлов кэша в минутах. Если FS смонтирована с `noatime` (а почти всегда это так) то время жизни будет исчисляться от времени создания файла, иначе от времени последнего доступа к файлу. Может некорректно работать в Windows. По умолчанию `0` (файлы кэша живут вечно).
 
 ## Проверка
 <http://localhost:8080/say?text=Привет>
