@@ -127,8 +127,8 @@ class CacheLifeTime(threading.Thread):
 
     def run(self):
         self._run = True
-        print('Cache lifetime: {} minutes'.format(self._lifetime))
-        self._lifetime *= 60
+        print('Cache lifetime: {} hours'.format(self._lifetime))
+        self._lifetime *= 60 * 60
         while self._run:
             current_time = time.time()
             for file in os.listdir(self._path):
