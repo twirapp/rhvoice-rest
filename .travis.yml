@@ -1,9 +1,6 @@
 language:
   python
 
-env:
-  - RHVOICE_FCACHE_LIFETIME=12
-
 matrix:
   include:
   - python: '3.6'
@@ -28,7 +25,7 @@ addons:
 before_install:
   - docker --version
   - docker build -t aculeasis/rhvoice-rest-test:amd64 -f Dockerfile.amd64 .
-  - docker run -d -p 8080:8080 -e THREADED=6 -e RHVOICE_FCACHE --name rhvoice-rest aculeasis/rhvoice-rest-test:amd64
+  - docker run -d -p 8080:8080 -e RHVOICE_FCACHE_LIFETIME=12 -e THREADED=6 -e RHVOICE_FCACHE --name rhvoice-rest aculeasis/rhvoice-rest-test:amd64
   - sleep 5
   - docker images
   - docker ps -a
