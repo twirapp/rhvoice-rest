@@ -2,8 +2,8 @@
 FROM arm64v8/ubuntu:bionic
 
 ARG RUNTIME_PACKAGES="lame python3 locales opus-tools"
-ARG BUILD_PACKAGES="git python3-pip python3-setuptools python3-wheel"
-ARG PIP_PACKAGE="flask pymorphy2 rhvoice-wrapper"
+ARG BUILD_PACKAGES="git scons build-essential python3-pip python3-setuptools python3-wheel"
+ARG PIP_PACKAGE="flask pymorphy2 rhvoice-wrapper rhvoice-wrapper-bin"
 
 RUN apt-get update -y && \
     apt-get -y install --no-install-recommends $RUNTIME_PACKAGES && \
@@ -12,7 +12,6 @@ RUN apt-get update -y && \
     cd /usr/share/locale/ && ls | grep -v 'ru\|en\|locale.alias' | xargs rm -rf && \
     locale-gen ru_RU.UTF-8 && \
     pip3 install $PIP_PACKAGE && \
-    pip3 install https://github.com/Aculeasis/rhvoice-wrapper-bin/releases/download/0.1.3/rhvoice_wrapper_bin-0.1.3-py3-none-linux_aarch64.whl && \
     git clone https://github.com/vantu5z/RHVoice-dictionary.git /opt/RHVoice-dictionary && \
     mkdir -p /usr/local/etc/RHVoice/dicts/Russian/ && \
     cp /opt/RHVoice-dictionary/*.txt /usr/local/etc/RHVoice/dicts/Russian/ && \
