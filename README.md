@@ -88,7 +88,7 @@ python3 -u app.py
 Протестировано на Windows 10 и Python 3.6.
 
 ## Настройки
-Все настройки задаются через переменные окружения, до запуска скрипта или при создании докера (через `-e`):
+Все настройки задаются через переменные окружения, до запуска скрипта или при создании докер-контейнера (через `-e`):
 - **RHVOICELIBPATH**: Путь до библиотеки RHVoice. По умолчанию `RHVoice.dll` в Windows и `libRHVoice.so` в Linux.
 - **RHVOICEDATAPATH**:  Путь до данных RHVoice. По умолчанию `/usr/local/share/RHVoice`.
 - **RHVOICERESOURCES**: Путь до неких ресурсов, я не знаю что это. По умолчанию `/usr/local/etc/RHVoice/dicts/Russian/`.
