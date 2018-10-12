@@ -26,7 +26,7 @@ app = Flask(__name__, static_url_path='')
 def voice_streamer(text, voice, format_, sets):
     fp, src_path, dst_path = None, None, None
     if CACHE_DIR:  # Режим с кэшем
-        str_sets = '.'.join(str(sets.get(k, 50)) for k in ['absolute_rate', 'absolute_pitch', 'absolute_volume'])
+        str_sets = '.'.join(str(sets.get(k, 0.0)) for k in ['absolute_rate', 'absolute_pitch', 'absolute_volume'])
         name = hashlib.sha1('.'.join([text, voice, format_, str_sets]).encode()).hexdigest() + '.cache'
         dst_path = os.path.join(CACHE_DIR, name)
         if os.path.isfile(dst_path):
