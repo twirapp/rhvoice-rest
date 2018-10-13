@@ -32,6 +32,9 @@ def voice_streamer(text, voice, format_, sets):
         name = hashlib.sha1('.'.join([text, voice, format_, str_sets]).encode()).hexdigest() + '.cache'
         dst_path = os.path.join(CACHE_DIR, name)
         if os.path.isfile(dst_path):
+            if FS_NOATIME:  # Обновляем atime и mtime вручную
+                timestamp = time.time()
+                os.utime(dst_path, times=(timestamp, timestamp))
             with open(dst_path, 'rb') as f:
                 while True:
                     chunk = f.read(2048)
@@ -103,6 +106,21 @@ def _cache_enable():
         return os.path.join(os.path.abspath(sys.path[0]), 'rhvoice_rest_cache')
 
 
+def _noatime_enable():
+    test = os.path.join(CACHE_DIR, 'atime.test')
+    with open(test, 'wb') as fp:
+        fp.write(b'test')
+    old_atime = os.stat(test).st_atime
+    time.sleep(3)
+    with open(test, 'rb') as fp:
+        _ = fp.read()
+    new_atime = os.stat(test).st_atime
+    os.remove(test)
+    if old_atime == new_atime:
+        print('FS mount with noatime, atime will update manually')
+    return old_atime == new_atime
+
+
 class CacheLifeTime(threading.Thread):
     def __init__(self, cache_path, lifetime=None):
         self._run = False
@@ -119,6 +137,10 @@ class CacheLifeTime(threading.Thread):
             self._wait = threading.Event()
             self._run = True
             self.start()
+
+    @property
+    def work(self):
+        return self._run
 
     def join(self, timeout=None):
         if self._run:
@@ -149,6 +171,7 @@ if __name__ == "__main__":
 
     CACHE_DIR = _cache_enable()
     cache_lifetime = CacheLifeTime(cache_path=CACHE_DIR)
+    FS_NOATIME = cache_lifetime.work and _noatime_enable()
 
     formats = tts.formats
     DEFAULT_FORMAT = _get_def(formats, DEFAULT_FORMAT)
