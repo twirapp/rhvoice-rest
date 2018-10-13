@@ -1,0 +1,43 @@
+version: 1.0.0 ({build})
+
+environment:
+  PYTHON: C:\Python36-x64
+  PYTHONUNBUFFERED: 1
+  THREADED: 3
+
+  matrix:
+  - RHVOICE_FCACHE: false
+  - RHVOICE_FCACHE: true
+  - RHVOICE_FCACHE: true
+    RHVOICE_FCACHE_LIFETIME: 1
+
+matrix:
+  fast_finish: true
+
+clone_depth: 1
+
+build: off
+
+max_jobs: 6
+
+init:
+  - set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%
+
+install:
+  - python -m pip install -q --upgrade wheel
+  - pip install -q flask pymorphy2 rhvoice-wrapper rhvoice-wrapper-bin aiohttp --only-binary rhvoice-wrapper-bin rhvoice-wrapper
+  - git clone -q --depth=1 https://github.com/vantu5z/RHVoice-dictionary
+  - xcopy /s /I /Q RHVoice-dictionary\tools tools
+
+before_test:
+  - ver
+  - python -VV
+
+test_script:
+  - ps: $MyProcess = Start-Process "python" -ArgumentList "-u","app.py" -RedirectStandardOutput "logs" -PassThru
+  - ping 127.0.0.1 -n 4 > nul
+  - python -u example/threaded_test.py
+
+on_finish:
+  - ps: Stop-Process -Id $MyProcess.Id
+  - type logs
