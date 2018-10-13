@@ -43,7 +43,7 @@ def voice_streamer(text, voice, format_, sets):
                     yield chunk
             return
         # Если клиент отвалится получим мусор во временных файлах а не в кэше
-        src_path = os.path.join(TEMP_DIR, name)
+        src_path = os.path.join(TEMP_DIR, hashlib.sha1(os.urandom(32)).hexdigest())
         fp = open(src_path, 'wb')
 
     with tts.say(text, voice, format_, sets=sets or None) as read:
@@ -181,6 +181,7 @@ if __name__ == "__main__":
     DEFAULT_VOICE = _get_def(SUPPORT_VOICES, DEFAULT_VOICE)
     SUPPORT_VOICES = set(SUPPORT_VOICES)
 
+    print('Threads: {}'.format(tts.thread_count))
     app.run(host='0.0.0.0', port=8080, threaded=tts.thread_count > 1)
     cache_lifetime.join()
     tts.join()
