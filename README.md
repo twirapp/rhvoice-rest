@@ -57,9 +57,9 @@
 `volume` - Громкость голоса. По умолчанию `50`.
 
 ## Нативный запуск
-Для начала нужно установить [rhvoice-wrapper](https://github.com/Aculeasis/rhvoice-proxy):
+Для начала нужно установить зависимости:
 
-`pip3 install rhvoice-wrapper>=0.3.1`
+`pip3 install flask pymorphy2 rhvoice-wrapper`
 
 Собрать и установить [RHVoice](https://github.com/Olga-Yakovleva/RHVoice) или установить [rhvoice-wrapper-bin](https://github.com/Aculeasis/rhvoice-wrapper-bin) предоставляющий библиотеки и данные RHVoice. Второй вариант рекомендуется для Windows т.к. не требует сборки.
 
