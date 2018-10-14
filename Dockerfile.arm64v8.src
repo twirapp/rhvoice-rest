@@ -17,7 +17,6 @@ RUN apt-get update -y && \
     cp /opt/RHVoice-dictionary/*.txt /usr/local/etc/RHVoice/dicts/Russian/ && \
     cp -R /opt/RHVoice-dictionary/tools /opt/ && \
     cd /opt && mkdir /opt/cfg && \
-    echo "$(pip3 show rhvoice-wrapper-bin | grep Location | awk '{print $2}')/rhvoice_wrapper_bin/lib/" > /opt/LIBRARY_PATH && \
     apt-get remove --purge -y $BUILD_PACKAGES $(apt-mark showauto) && \
     apt-get autoremove -y && \
     apt-get -y install --no-install-recommends $RUNTIME_PACKAGES && \
