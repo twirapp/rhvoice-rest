@@ -13,7 +13,13 @@ from urllib import parse
 from flask import Flask, request, make_response, Response, stream_with_context
 from rhvoice_wrapper import TTS
 
-from tools.preprocessing.text_prepare import text_prepare
+try:
+    from tools.preprocessing.text_prepare import text_prepare
+except ImportError as e:
+    print('Warning! Preprocessing disable: {}'.format(e))
+
+    def text_prepare(text):
+        return text
 
 DEFAULT_VOICE = 'anna'
 
