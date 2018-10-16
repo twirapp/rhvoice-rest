@@ -108,9 +108,10 @@ def arg_parser():
     return parser.parse_args()
 
 
-def _print(text_size, reply_size, reply_time, full_time):
-    print('Send: {}, Receive: {}, Reply time: {}, Full time: {}'.format(
-        text_size, pretty_size(reply_size), pretty_time(reply_time), pretty_time(full_time)))
+def _print(text_size, reply_size, reply_time, write_time, full_time):
+    full_time = full_time - write_time
+    print('Send: {}, Receive: {}, Reply time: {}, Full time: {}, Play Time: {}'.format(
+        text_size, pretty_size(reply_size), pretty_time(reply_time), pretty_time(full_time), pretty_time(write_time)))
 
 
 def main():
@@ -120,6 +121,7 @@ def main():
     reply_size_all = 0
     reply_time_all = 0
     full_time_all = 0
+    write_time_all = 0
     counts = 0
     while True:
         text = args.file.read(args.chunks)
@@ -129,24 +131,27 @@ def main():
         reply_size = 0
         full_time = time.time()
         reply_time = None
+        write_time = 0
         for chunk in RHVoiceREST(text, speaker=args.voice, url='http://{}:{}'.format(args.ip, args.port)).iter_me():
             if reply_time is None:
                 reply_time = time.time() - full_time
             reply_size += len(chunk)
+            start_time = time.time()
             play.play_chunk(chunk)
+            write_time += time.time() - start_time
         full_time = time.time() - full_time
-
+        write_time_all + write_time
         text_size_all += text_size
         reply_size_all += reply_size
         reply_time_all += reply_time
         full_time_all += full_time
         counts += 1
-        _print(text_size, reply_size, reply_time, full_time)
+        _print(text_size, reply_size, reply_time, write_time, full_time)
     args.file.close()
     play.close()
     if counts:
         print('Summary:')
-        _print(text_size_all, reply_size_all, reply_time_all / counts, full_time_all)
+        _print(text_size_all, reply_size_all, reply_time_all / counts, write_time_all, full_time_all)
     print('bye.')
 
 
