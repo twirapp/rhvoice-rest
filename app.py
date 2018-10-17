@@ -23,7 +23,7 @@ except ImportError as e:
 
 DEFAULT_VOICE = 'anna'
 
-FORMATS = {'wav': 'audio/wav', 'mp3': 'audio/mpeg', 'opus': 'audio/ogg'}
+FORMATS = {'wav': 'audio/wav', 'mp3': 'audio/mpeg', 'opus': 'audio/ogg', 'flac': 'audio/flac'}
 DEFAULT_FORMAT = 'mp3'
 
 TEMP_DIR = tempfile.gettempdir()
@@ -188,6 +188,6 @@ if __name__ == "__main__":
     SUPPORT_VOICES = set(SUPPORT_VOICES)
 
     print('Threads: {}'.format(tts.thread_count))
-    app.run(host='0.0.0.0', port=8080, threaded=tts.thread_count > 1)
+    app.run(host='0.0.0.0', port=8080, threaded=True)
     cache_lifetime.join()
     tts.join()
