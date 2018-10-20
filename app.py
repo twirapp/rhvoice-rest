@@ -15,8 +15,8 @@ from rhvoice_wrapper import TTS
 
 try:
     from tools.preprocessing.text_prepare import text_prepare
-except ImportError as e:
-    print('Warning! Preprocessing disable: {}'.format(e))
+except ImportError as err:
+    print('Warning! Preprocessing disable: {}'.format(err))
 
     def text_prepare(text):
         return text
@@ -67,6 +67,18 @@ def voice_streamer(text, voice, format_, sets):
                 print('Cache error: {}'.format(e))
 
 
+def chunked_stream(stream):
+    b_break = b'\r\n'
+    for chunk in stream:
+        yield format(len(chunk), 'x').encode() + b_break + chunk + b_break
+    yield b'0' + b_break * 2
+
+
+def set_headers():
+    if CHUNKED_TRANSFER:
+        return {'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive'}
+
+
 @app.route('/say')
 def say():
     text = ' '.join([x for x in parse.unquote(request.args.get('text', '')).splitlines() if x])
@@ -82,7 +94,10 @@ def say():
 
     text = quote(text_prepare(text))
     sets = _get_sets(request.args)
-    return Response(stream_with_context(voice_streamer(text, voice, format_, sets)), mimetype=FORMATS[format_])
+    stream = voice_streamer(text, voice, format_, sets)
+    if CHUNKED_TRANSFER:
+        stream = chunked_stream(stream)
+    return Response(stream_with_context(stream), mimetype=FORMATS[format_], headers=set_headers())
 
 
 def _normalize_set(val):  # 0..100 -> -1.0..1
@@ -103,9 +118,12 @@ def _get_def(any_, test):
     return test
 
 
+def _check_env(word: str) -> bool:
+    return word in os.environ and os.environ[word].lower() not in ['no', 'disable', 'false']
+
+
 def _cache_enable():
-    word = 'RHVOICE_FCACHE'
-    if word in os.environ and os.environ[word].lower() not in ['no', 'disable', 'false']:
+    if _check_env('RHVOICE_FCACHE'):
         path = os.path.join(os.path.abspath(sys.path[0]), 'rhvoice_rest_cache')
         os.makedirs(path, exist_ok=True)
         print('Cache enable: {}'.format(path))
@@ -178,6 +196,8 @@ if __name__ == "__main__":
     CACHE_DIR = _cache_enable()
     cache_lifetime = CacheLifeTime(cache_path=CACHE_DIR)
     FS_NOATIME = cache_lifetime.work and _noatime_enable()
+    CHUNKED_TRANSFER = _check_env('CHUNKED_TRANSFER')
+    print('Chunked transfer encoding: {}'.format(CHUNKED_TRANSFER))
 
     formats = tts.formats
     DEFAULT_FORMAT = _get_def(formats, DEFAULT_FORMAT)
