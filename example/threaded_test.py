@@ -46,7 +46,7 @@ def test(count):
 
     size = workers[0][0]
     for test_size in workers:
-        assert size == test_size[0]
+        assert size == test_size[0], '{}'.format([x[0] for x in workers])
         assert test_size[0]
 
     real_w_time = sum([x[1] for x in workers])

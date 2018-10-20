@@ -35,7 +35,7 @@ install:
   - pip install aiohttp
 
 script:
-  - python -u example/threaded_test.py
+  - python -u example/threaded_test.py 16
 
 after_script:
   - docker stop rhvoice-rest
