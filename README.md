@@ -65,7 +65,7 @@
 
 И еще рядом с app.py положить `tools` из [RHVoice-dictionary](https://github.com/vantu5z/RHVoice-dictionary).
 
-Для поддержки `mp3` и `opus` нужно установить `lame` и `opus-tools`
+Для поддержки `mp3`, `opus` и `flac` нужно установить `lame`, `opus-tools` и `flac`
 
 ### Устновка скриптом на debian-based дистрибутивах в качестве сервиса
     git clone https://github.com/Aculeasis/rhvoice-rest
@@ -79,7 +79,7 @@
 
 **RHVOICELIBPATH** до `RHVoice.dll` той же архитектуры что и питон и **RHVOICEDATAPATH** до папки с languages и voices. По умолчанию они ставятся в `C:\Program Files (x86)\RHVoice\data`
 
-Не обязательно: **LAMEPATH**, **OPUSENCPATH** и **FLACPATH** для поддержки соответствующих форматов. Возможно, использование `opusenc.exe` может вызывать переполнение буфера и зависание процесса синтеза. В Linux проблем не замечено.
+Не обязательно: **LAMEPATH**, **OPUSENCPATH** и **FLACPATH** для поддержки соответствующих форматов.
 
 Протестировано на Windows 10 и Python 3.6.
 
