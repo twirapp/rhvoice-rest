@@ -52,7 +52,7 @@ def voice_streamer(text, voice, format_, sets):
         src_path = os.path.join(TEMP_DIR, hashlib.sha1(os.urandom(32)).hexdigest())
         fp = open(src_path, 'wb')
 
-    with tts.say(text, voice, format_, sets=sets or None) as read:
+    with tts.say(text, voice, format_, None, sets or None) as read:
         for chunk in read:
             if fp:
                 fp.write(chunk)
