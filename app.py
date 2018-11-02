@@ -112,9 +112,9 @@ def _get_sets(args):
     return {keys[key]: _normalize_set(args[key]) for key in keys if key in args}
 
 
-def _get_def(any_, test):
+def _get_def(any_, test, def_=None):
     if test not in any_ and len(any_):
-        return any_[0]
+        return def_ if def_ and def_ in any_ else next(iter(any_))
     return test
 
 
@@ -200,7 +200,7 @@ if __name__ == "__main__":
     print('Chunked transfer encoding: {}'.format(CHUNKED_TRANSFER))
 
     formats = tts.formats
-    DEFAULT_FORMAT = _get_def(formats, DEFAULT_FORMAT)
+    DEFAULT_FORMAT = _get_def(formats, DEFAULT_FORMAT, 'wav')
     FORMATS = {key: val for key, val in FORMATS.items() if key in formats}
 
     SUPPORT_VOICES = tts.voices
