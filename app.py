@@ -26,21 +26,14 @@ DEFAULT_VOICE = 'anna'
 FORMATS = {'wav': 'audio/wav', 'mp3': 'audio/mpeg', 'opus': 'audio/ogg', 'flac': 'audio/flac'}
 DEFAULT_FORMAT = 'mp3'
 
-TEMP_DIR = tempfile.gettempdir()
-
 app = Flask(__name__, static_url_path='')
 
 
 def voice_streamer(text, voice, format_, sets):
-    fp, src_path, dst_path = None, None, None
-    if CACHE_DIR:  # Режим с кэшем
-        str_sets = '.'.join(str(sets.get(k, 0.0)) for k in ['absolute_rate', 'absolute_pitch', 'absolute_volume'])
-        name = hashlib.sha1('.'.join([text, voice, format_, str_sets]).encode()).hexdigest() + '.cache'
-        dst_path = os.path.join(CACHE_DIR, name)
-        if os.path.isfile(dst_path):
-            if FS_NOATIME:  # Обновляем atime и mtime вручную
-                timestamp = time.time()
-                os.utime(dst_path, times=(timestamp, timestamp))
+    fp, src_path = None, None
+    dst_path = cache.get_file_path(text, voice, format_, sets)
+    if dst_path:
+        if cache.file_found(dst_path):
             with open(dst_path, 'rb') as f:
                 while True:
                     chunk = f.read(2048)
@@ -49,7 +42,7 @@ def voice_streamer(text, voice, format_, sets):
                     yield chunk
             return
         # Если клиент отвалится получим мусор во временных файлах а не в кэше
-        src_path = os.path.join(TEMP_DIR, hashlib.sha1(os.urandom(32)).hexdigest())
+        src_path = cache.tmp_file_path
         fp = open(src_path, 'wb')
 
     with tts.say(text, voice, format_, None, sets or None) as read:
@@ -61,10 +54,7 @@ def voice_streamer(text, voice, format_, sets):
     if fp:
         fp.close()
         if src_path and os.path.isfile(src_path):
-            try:
-                shutil.move(src_path, dst_path)
-            except OSError as e:
-                print('Cache error: {}'.format(e))
+            cache.move(src_path, dst_path)
 
 
 def chunked_stream(stream):
@@ -122,45 +112,51 @@ def _check_env(word: str) -> bool:
     return word in os.environ and os.environ[word].lower() not in ['no', 'disable', 'false']
 
 
-def _cache_enable():
-    if _check_env('RHVOICE_FCACHE'):
-        path = os.path.join(os.path.abspath(sys.path[0]), 'rhvoice_rest_cache')
-        os.makedirs(path, exist_ok=True)
-        print('Cache enable: {}'.format(path))
-        return os.path.join(os.path.abspath(sys.path[0]), 'rhvoice_rest_cache')
-
-
-def _noatime_enable():
-    test = os.path.join(CACHE_DIR, 'atime.test')
-    with open(test, 'wb') as fp:
-        fp.write(b'test')
-    old_atime = os.stat(test).st_atime
-    time.sleep(3)
-    with open(test, 'rb') as fp:
-        _ = fp.read()
-    new_atime = os.stat(test).st_atime
-    os.remove(test)
-    if old_atime == new_atime:
-        print('FS mount with noatime, atime will update manually')
-    return old_atime == new_atime
-
-
-class CacheLifeTime(threading.Thread):
-    def __init__(self, cache_path, lifetime=None):
+class CacheWorker(threading.Thread):
+    # TODO: Make file operations thread safe
+    def __init__(self):
         self._run = False
-        try:
-            if lifetime is None:
-                lifetime = int(os.environ.get('RHVOICE_FCACHE_LIFETIME', 0))
-        except (TypeError, ValueError):
-            lifetime = 0
-        if lifetime and cache_path:
+        self._path = self._get_cache_path()
+        self._lifetime = self._get_lifetime()
+        self._noatime = False
+        self._tmp = tempfile.gettempdir()
+        if self._path and self._lifetime:
             super().__init__()
             self._check_interval = 60 * 60
-            self._lifetime = lifetime
-            self._path = cache_path
             self._wait = threading.Event()
             self._run = True
+            self._noatime = self._noatime_enable()
             self.start()
+
+    @staticmethod
+    def _get_cache_path():  # Включаем поддержку кэша и возвращаем путь до него, или None
+        if _check_env('RHVOICE_FCACHE'):
+            path = os.path.join(os.path.abspath(sys.path[0]), 'rhvoice_rest_cache')
+            os.makedirs(path, exist_ok=True)
+            print('Cache enable: {}'.format(path))
+            return path
+
+    def _noatime_enable(self):
+        test = os.path.join(self._path, 'atime.test')
+        with open(test, 'wb') as fp:
+            fp.write(b'test')
+        old_atime = os.stat(test).st_atime
+        time.sleep(3)
+        with open(test, 'rb') as fp:
+            _ = fp.read()
+        new_atime = os.stat(test).st_atime
+        os.remove(test)
+        if old_atime == new_atime:
+            print('FS mount with noatime, atime will update manually')
+        return old_atime == new_atime
+
+    @staticmethod
+    def _get_lifetime():
+        try:
+            lifetime = int(os.environ.get('RHVOICE_FCACHE_LIFETIME', 0))
+        except (TypeError, ValueError):
+            return 0
+        return lifetime if lifetime > 0 else 0
 
     @property
     def work(self):
@@ -183,19 +179,50 @@ class CacheLifeTime(threading.Thread):
                     last_read = os.path.getatime(file_path)
                     diff = current_time - last_read
                     if diff > self._lifetime:
-                        try:
-                            os.remove(file_path)
-                        except OSError as e:
-                            print('Error deleting {}: {}'.format(file_path, e))
+                        self.remove(file_path)
             self._wait.wait(self._check_interval)
+
+    def _update_atime(self, path):
+        if self._noatime:  # Обновляем atime и mtime вручную
+            timestamp = time.time()
+            os.utime(path, times=(timestamp, timestamp))
+
+    def get_file_path(self, text, voice, format_, sets):
+        if not self._path:
+            return None
+        str_sets = '.'.join(str(sets.get(k, 0.0)) for k in ['absolute_rate', 'absolute_pitch', 'absolute_volume'])
+        name = hashlib.sha1('.'.join([text, voice, format_, str_sets]).encode()).hexdigest() + '.cache'
+        return os.path.join(self._path, name)
+
+    @property
+    def tmp_file_path(self):
+        return os.path.join(self._tmp, hashlib.sha1(os.urandom(32)).hexdigest())
+
+    def file_found(self, path):
+        if os.path.isfile(path):
+            self._update_atime(path)
+            return True
+        return False
+
+    @staticmethod
+    def move(src, dst):
+        try:
+            shutil.move(src, dst)
+        except OSError as e:
+            print('Cache move error: {}'.format(e))
+
+    @staticmethod
+    def remove(path):
+        try:
+            os.remove(path)
+        except OSError as e:
+            print('Error deleting {}: {}'.format(path, e))
 
 
 if __name__ == "__main__":
     tts = TTS()
 
-    CACHE_DIR = _cache_enable()
-    cache_lifetime = CacheLifeTime(cache_path=CACHE_DIR)
-    FS_NOATIME = cache_lifetime.work and _noatime_enable()
+    cache = CacheWorker()
     CHUNKED_TRANSFER = _check_env('CHUNKED_TRANSFER')
     print('Chunked transfer encoding: {}'.format(CHUNKED_TRANSFER))
 
@@ -209,5 +236,5 @@ if __name__ == "__main__":
 
     print('Threads: {}'.format(tts.thread_count))
     app.run(host='0.0.0.0', port=8080, threaded=True)
-    cache_lifetime.join()
+    cache.join()
     tts.join()
