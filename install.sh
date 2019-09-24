@@ -7,7 +7,7 @@ fi
 
 RUNTIME_PACKAGES="libao4 libasound2 libportaudio2 lame python3 python3-pip python3-setuptools locales opus-tools \
 locales-all"
-BUILD_PACKAGES="git scons build-essential libao-dev pkg-config flite1-dev portaudio19-dev"
+BUILD_PACKAGES="git scons python-lxml build-essential libao-dev pkg-config flite1-dev portaudio19-dev"
 
 
 apt-get update -y
