@@ -7,6 +7,8 @@ environment:
 
   matrix:
   - RHVOICE_FCACHE: false
+  - CHUNKED_TRANSFER: true
+  - RHVOICE_DYNCACHE: true
   - RHVOICE_FCACHE: true
   - RHVOICE_FCACHE: true
     RHVOICE_FCACHE_LIFETIME: 1

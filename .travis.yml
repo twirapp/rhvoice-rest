@@ -7,6 +7,8 @@ matrix:
   - python: '3.6'
     env: CHUNKED_TRANSFER=true
   - python: '3.6'
+    env: RHVOICE_DYNCACHE=true
+  - python: '3.6'
     env: RHVOICE_FCACHE=true
   - python: '3.6'
     env:
@@ -30,7 +32,7 @@ addons:
 before_install:
   - docker --version
   - docker build -t aculeasis/rhvoice-rest-test:amd64 -f Dockerfile.amd64 .
-  - docker run -d -p 8080:8080 -e THREADED=4 -e RHVOICE_FCACHE_LIFETIME -e RHVOICE_FCACHE -e CHUNKED_TRANSFER --name rhvoice-rest aculeasis/rhvoice-rest-test:amd64
+  - docker run -d -p 8080:8080 -e THREADED=4 -e RHVOICE_FCACHE_LIFETIME -e RHVOICE_FCACHE -e RHVOICE_DYNCACHE -e CHUNKED_TRANSFER --name rhvoice-rest aculeasis/rhvoice-rest-test:amd64
   - sleep 5
   - docker images
   - docker ps -a

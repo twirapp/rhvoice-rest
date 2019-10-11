@@ -17,6 +17,7 @@ sudo -H python3 -m pip install flask pymorphy2 rhvoice-wrapper
 
 mkdir -p /opt/rhvoice_proxy
 cp app.py /opt/rhvoice-rest.py
+cp rhvoice_rest_cache.py /opt/
 chmod +x /opt/rhvoice-rest.py
 
 {

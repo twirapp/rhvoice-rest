@@ -29,6 +29,7 @@ ENV LANG ru_RU.UTF-8
 ENV LANGUAGE ru_RU.UTF-8
 
 COPY entrypoint.sh /opt/entrypoint.sh
+COPY rhvoice_rest_cache.py /opt/rhvoice_rest_cache.py
 COPY app.py /opt/app.py
 
 EXPOSE 8080/tcp
