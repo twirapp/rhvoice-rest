@@ -146,6 +146,7 @@ class BeQueue:
                 chunk = self._read_chunk()
                 while chunk:
                     self._queue.append(chunk)
+                    yield chunk
                     with self._mutex:
                         self._mutex.notify_all()
                     chunk = self._read_chunk()
@@ -159,14 +160,26 @@ class BeQueue:
     def read(self):
         pos = 0
         while True:
-            self._generate()
-            with self._mutex:
-                size = len(self._queue)
-                while pos < size:
-                    yield self._queue[pos]
-                    pos += 1
-                if self.ended and size == len(self._queue):
+            size = len(self._queue)
+            while pos < size:
+                yield self._queue[pos]
+                pos += 1
+            if self.ended:
+                if pos == len(self._queue):
                     break
+                else:
+                    continue
+
+            for chunk in self._generate():
+                pos += 1
+                yield chunk
+
+            with self._mutex:
+                if self.ended:
+                    if pos == len(self._queue):
+                        break
+                    else:
+                        continue
                 self._mutex.wait()
 
     def acquire(self):
