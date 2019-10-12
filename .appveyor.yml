@@ -3,7 +3,7 @@ version: 1.0.0 ({build})
 environment:
   PYTHON: C:\Python36-x64
   PYTHONUNBUFFERED: 1
-  THREADED: 3
+  THREADED: 2
 
   matrix:
   - RHVOICE_FCACHE: false
@@ -38,7 +38,7 @@ before_test:
 test_script:
   - ps: $MyProcess = Start-Process "python" -ArgumentList "-u","app.py" -RedirectStandardOutput "logs" -PassThru
   - ping 127.0.0.1 -n 8 > nul
-  - python -u example/threaded_test.py 12
+  - python -u example/threaded_test.py 5
 
 on_finish:
   - ps: Stop-Process -Id $MyProcess.Id

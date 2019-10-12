@@ -33,25 +33,10 @@ def voice_streamer_nocache(text, voice, format_, sets):
 
 
 def voice_streamer_cache(text, voice, format_, sets):
-    # FIXME: Chrome отправляет 2 запроса почти одновременно, дропая первый.
-    #  В результате второй запрос попадает в поврежденный кэш.
     inst = cache.get(text, voice, format_, sets)
     try:
-        if inst.found():
-            for chunk in inst.read():
-                yield chunk
-        else:
-            try:
-                with tts.say(text, voice, format_, None, sets or None) as read:
-                    for chunk in read:
-                        inst.put(chunk)
-                        yield chunk
-            except:
-                inst.put_end(failure=True)
-                raise
-            else:
-                inst.put_end()
-
+        for chunk in inst.read():
+            yield chunk
     finally:
         inst.end()
 
@@ -122,7 +107,7 @@ def _get_cache_path():
 def cache_init() -> CacheWorker or None:
     path = _get_cache_path()
     dyn_cache = _check_env('RHVOICE_DYNCACHE')
-    return CacheWorker(path) if path or dyn_cache else None
+    return CacheWorker(path, tts.say) if path or dyn_cache else None
 
 
 if __name__ == "__main__":
