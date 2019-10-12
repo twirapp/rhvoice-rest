@@ -33,6 +33,8 @@ def voice_streamer_nocache(text, voice, format_, sets):
 
 
 def voice_streamer_cache(text, voice, format_, sets):
+    # FIXME: Chrome отправляет 2 запроса почти одновременно, дропая первый.
+    #  В результате второй запрос попадает в поврежденный кэш.
     inst = cache.get(text, voice, format_, sets)
     try:
         if inst.found():
@@ -44,7 +46,10 @@ def voice_streamer_cache(text, voice, format_, sets):
                     for chunk in read:
                         inst.put(chunk)
                         yield chunk
-            finally:
+            except:
+                inst.put_end(failure=True)
+                raise
+            else:
                 inst.put_end()
 
     finally:

@@ -103,6 +103,7 @@
 
 <http://localhost:8080/say?text=Kaj%20mi%20ankaŭ%20parolas%20Esperanton&voice=spomenka&format=opus>
 
+**Важно**: Chromium-based браузеры могут работать некорректно с включенным кэшем.
 ## Интеграция
 - Home Assistant https://github.com/mgarmash/ha-rhvoice-tts
 - [Примеры](https://github.com/Aculeasis/rhvoice-rest/tree/master/example)

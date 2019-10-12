@@ -13,7 +13,7 @@ class BaseInstance:
     def put(self, _):
         raise NotImplementedError
 
-    def put_end(self):
+    def put_end(self, failure=False):
         raise NotImplementedError
 
     def read(self):
@@ -137,10 +137,12 @@ class BeQueue:
         self._queue = collections.deque()
         self._ended = False
         self._locked = False
+        self.failure = False
         self._users = 0
 
-    def put_end(self):
+    def put_end(self, failure):
         with self._mutex:
+            self.failure |= failure
             self._ended = True
             self._mutex.notify_all()
 
@@ -172,7 +174,7 @@ class BeQueue:
 
     def release(self):
         self._users -= 1
-        if not self._users:
+        if not self._users or self.failure:
             self._locked = True
 
 
@@ -190,8 +192,8 @@ class DynCacheInstance(BaseInstance):
     def put(self, data):
         self._data.put(data)
 
-    def put_end(self):
-        self._data.put_end()
+    def put_end(self, failure=False):
+        self._data.put_end(failure)
 
     def read(self):
         return self._data.read()
@@ -201,8 +203,12 @@ class DynCacheInstance(BaseInstance):
         with self._lock:
             self._data.release()
             if self._data.locked():
-                save = True
-                self._cb()
+                save = not self._data.failure
+                try:
+                    self._cb()
+                except KeyError as e:
+                    if not self._data.failure:
+                        raise e
         if save:
             self._save()
 
@@ -226,7 +232,7 @@ class FileCacheReaderInstance(BaseInstance):
     def put(self, _):
         pass
 
-    def put_end(self):
+    def put_end(self, failure=False):
         pass
 
     def read(self):
@@ -240,5 +246,5 @@ class FileCacheReaderInstance(BaseInstance):
         except OSError as e:
             print('Read error {}: {}'.format(self._path, e))
 
-    def end(self):
+    def end(self, failure=False):
         pass
