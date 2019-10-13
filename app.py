@@ -38,7 +38,7 @@ def voice_streamer_cache(text, voice, format_, sets):
         for chunk in inst.read():
             yield chunk
     finally:
-        inst.end()
+        inst.release()
 
 
 def chunked_stream(stream):

@@ -10,7 +10,7 @@ class BaseInstance:
     def read(self):
         raise NotImplementedError
 
-    def end(self):
+    def release(self):
         raise NotImplementedError
 
 
@@ -22,7 +22,7 @@ class CacheWorker(threading.Thread):
         self._lifetime = self._get_lifetime()
         self._noatime = False
         self._tmp = tempfile.gettempdir()
-        self._dyn_cache = DynCache(self._path, say)
+        self._dyn_cache = DynCache(say)
         print('Dynamic cache: enable.')
         if self._path:
             print('File cache: {}'.format(self._path))
@@ -104,127 +104,86 @@ class CacheWorker(threading.Thread):
 
 
 class DynCache:
-    def __init__(self, path, say):
+    def __init__(self, say):
         self._say = say
-        self._path = path
         self._lock = threading.Lock()
         self._data = {}
 
     def get(self, name: str, path: str, text, voice, format_, sets):
         def cb():
-            del self._data[name]
+            with self._lock:
+                del self._data[name]
 
         with self._lock:
             if name not in self._data:
-                self._data[name] = BeQueue(self._say(text, voice, format_, None, sets or None))
-            return DynCacheInstance(path, self._lock, self._data[name].acquire(), cb)
+                self._data[name] = DynCacheInstance(path, self._say(text, voice, format_, None, sets or None), cb)
+            result = self._data[name]
+        return result.acquire()
 
 
-class BeQueue:
-    def __init__(self, generator):
+class DynCacheInstance(threading.Thread, BaseInstance):
+    def __init__(self, path, generator, cb):
+        threading.Thread.__init__(self)
+        self._path = path
         self._tts = generator
-        self._generator = None
+        self._cb = cb
         self._mutex = threading.Condition(threading.Lock())
         self._lock = threading.Lock()
-        self._queue = collections.deque()
+        self._deque = collections.deque()
         self.ended = False
         self.locked = False
         self._users = 0
+        self.start()
 
-    def _read_chunk(self):
+    def run(self):
         try:
-            return None if self.ended else next(self._generator)
-        except StopIteration:
-            self.ended = True
-            with self._mutex:
-                self._mutex.notify_all()
-            return None
-
-    def _generate(self):
-        if not self.ended and self._lock.acquire(blocking=False):
-            try:
-                chunk = self._read_chunk()
-                while chunk:
-                    self._queue.append(chunk)
-                    yield chunk
+            with self._tts as read:
+                for chunk in read:
+                    self._deque.append(chunk)
+                    if self.locked:
+                        return
                     with self._mutex:
                         self._mutex.notify_all()
-                    chunk = self._read_chunk()
-            except:
-                with self._mutex:
-                    self._mutex.notify_all()
-                raise
-            finally:
-                self._lock.release()
+
+                self.ended = True
+            self._save()
+        finally:
+            with self._mutex:
+                self._mutex.notify_all()
 
     def read(self):
         pos = 0
-        while True:
-            size = len(self._queue)
-            while pos < size:
-                yield self._queue[pos]
-                pos += 1
-            if self.ended:
-                if pos == len(self._queue):
-                    break
-                else:
-                    continue
-
-            for chunk in self._generate():
-                pos += 1
-                yield chunk
-
-            with self._mutex:
+        with self._mutex:
+            while True:
+                size = len(self._deque)
+                while pos < size:
+                    yield self._deque[pos]
+                    pos += 1
                 if self.ended:
-                    if pos == len(self._queue):
+                    if pos == len(self._deque):
                         break
                     else:
                         continue
                 self._mutex.wait()
 
     def acquire(self):
-        if self.locked:
-            raise RuntimeError('Queue reached end of life')
-        self._users += 1
-        if not self._generator:
-            self._generator = self._tts.__enter__()
-        return self
+        with self._lock:
+            self._users += 1
+            return self
 
     def release(self):
-        self._users -= 1
-        if not self._users:
-            self.locked = True
-            self._tts.__exit__(None, None, None)
-
-    def dump(self) -> bytes:
-        return b''.join(self._queue)
-
-
-class DynCacheInstance(BaseInstance):
-    def __init__(self, file_path, lock, data: BeQueue, clear_callback):
-        self._path = file_path
-        self._lock = lock
-        self._data = data
-        self._cb = clear_callback
-
-    def read(self):
-        return self._data.read()
-
-    def end(self):
-        save = False
         with self._lock:
-            self._data.release()
-            if self._data.locked:
-                save = True
+            self._users -= 1
+            if not (self._users or self.locked):
+                self.locked = True
                 self._cb()
-        if save:
-            self._save()
+                self.join(timeout=10)
 
     def _save(self):
-        if self._path and self._data.ended:
+        if self._path:
             try:
                 with open(self._path, 'wb') as fd:
-                    fd.write(self._data.dump())
+                    fd.write(b''.join(self._deque))
             except OSError as e:
                 print('Write error {}: {}'.format(self._path, e))
 
@@ -244,5 +203,5 @@ class FileCacheReaderInstance(BaseInstance):
         except OSError as e:
             print('Read error {}: {}'.format(self._path, e))
 
-    def end(self):
+    def release(self):
         pass
