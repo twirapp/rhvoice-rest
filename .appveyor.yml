@@ -6,7 +6,7 @@ environment:
   THREADED: 2
 
   matrix:
-  - RHVOICE_FCACHE: false
+  - THREADED: 1
   - CHUNKED_TRANSFER: true
   - RHVOICE_DYNCACHE: true
   - RHVOICE_FCACHE: true
