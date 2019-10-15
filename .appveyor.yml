@@ -3,7 +3,7 @@ version: 1.0.0 ({build})
 environment:
   PYTHON: C:\Python36-x64
   PYTHONUNBUFFERED: 1
-  THREADED: 1
+  THREADED: 2
 
   matrix:
   - RHVOICE_FCACHE: false
