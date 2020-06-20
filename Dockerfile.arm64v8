@@ -16,7 +16,7 @@ RUN apt-get update -y && \
     git clone https://github.com/vantu5z/RHVoice-dictionary.git /opt/RHVoice-dictionary && \
     mkdir -p /usr/local/etc/RHVoice/dicts/Russian/ && \
     cp /opt/RHVoice-dictionary/*.txt /usr/local/etc/RHVoice/dicts/Russian/ && \
-    cp -R /opt/RHVoice-dictionary/tools /opt/ && \
+    cp -R /opt/RHVoice-dictionary/tools /opt/rhvoice_tools && \
     cd /opt && mkdir /opt/cfg && \
     apt-get remove --purge -y $BUILD_PACKAGES $(apt-mark showauto) && \
     apt-get autoremove -y && \

@@ -11,11 +11,11 @@ from rhvoice_wrapper import TTS
 from rhvoice_rest_cache import CacheWorker
 
 try:
-    from tools.preprocessing.text_prepare import text_prepare
+    from rhvoice_tools.preprocessing.text_prepare import text_prepare
 except ImportError as err:
     print('Warning! Preprocessing disable: {}'.format(err))
 
-    def text_prepare(text):
+    def text_prepare(text, stress_marker=False, debug=False):
         return text
 
 DEFAULT_VOICE = 'anna'

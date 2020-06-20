@@ -38,7 +38,7 @@ cd /opt/RHVoice && scons && scons install && ldconfig
 git clone https://github.com/vantu5z/RHVoice-dictionary.git /opt/RHVoice-dictionary && \
 mkdir -p /usr/local/etc/RHVoice/dicts/Russian/ && mkdir -p /opt/data && \
 cp /opt/RHVoice-dictionary/*.txt /usr/local/etc/RHVoice/dicts/Russian/ && \
-cp -R /opt/RHVoice-dictionary/tools /opt/ && \
+cp -R /opt/RHVoice-dictionary/tools /opt/rhvoice_tools && \
 cd /opt && rm -rf /opt/RHVoice /opt/RHVoice-dictionary
 
 systemctl enable rhvoice-rest.service
