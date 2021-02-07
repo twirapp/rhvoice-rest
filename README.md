@@ -65,7 +65,7 @@
 
 Собрать и установить [RHVoice](https://github.com/Olga-Yakovleva/RHVoice) или установить [rhvoice-wrapper-bin](https://github.com/Aculeasis/rhvoice-wrapper-bin) предоставляющий библиотеки и данные RHVoice. Второй вариант рекомендуется для Windows т.к. не требует сборки.
 
-И еще рядом с app.py положить `rhvoice_tools` - переименовав `tools` из [RHVoice-dictionary](https://github.com/vantu5z/RHVoice-dictionary).
+И еще рядом с app.py положить `rhvoice_tools` - переименовав `preprocessing` из [RHVoice-dictionary/tools](https://github.com/vantu5z/RHVoice-dictionary/tree/master/tools).
 
 Для поддержки `mp3`, `opus` и `flac` нужно установить `lame`, `opus-tools` и `flac`
 
