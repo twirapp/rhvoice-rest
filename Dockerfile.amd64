@@ -13,9 +13,9 @@ RUN apt-get update -y && \
     locale-gen ru_RU.UTF-8 && \
     pip3 install $PIP_PACKAGE && \
     git clone https://github.com/vantu5z/RHVoice-dictionary.git /opt/RHVoice-dictionary && \
-    mkdir -p /usr/local/etc/RHVoice/dicts/Russian/ && \
-    cp /opt/RHVoice-dictionary/*.txt /usr/local/etc/RHVoice/dicts/Russian/ && \
-    cp -R /opt/RHVoice-dictionary/tools /opt/rhvoice_tools && \
+    mkdir -p /usr/local/etc/RHVoice/ && \
+    cp -R /opt/RHVoice-dictionary/dicts /usr/local/etc/RHVoice/dicts && \
+    cp -R /opt/RHVoice-dictionary/tools/preprocessing /opt/rhvoice_tools && \
     cd /opt && mkdir /opt/cfg && \
     apt-get remove --purge -y $BUILD_PACKAGES $(apt-mark showauto) && \
     apt-get autoremove -y && \

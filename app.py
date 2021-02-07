@@ -11,7 +11,7 @@ from rhvoice_wrapper import TTS
 from rhvoice_rest_cache import CacheWorker
 
 try:
-    from rhvoice_tools.preprocessing.text_prepare import text_prepare
+    from rhvoice_tools.text_prepare import text_prepare
 except ImportError as err:
     print('Warning! Preprocessing disable: {}'.format(err))
 
