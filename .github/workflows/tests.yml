@@ -13,13 +13,13 @@ jobs:
       PYTHONUNBUFFERED: 1
       THREADED: 2
     runs-on: ${{ matrix.os }}
-      strategy:
-        fail-fast: false
-        matrix:
-          env: [CHUNKED_TRANSFER: true, RHVOICE_DYNCACHE: true, RHVOICE_FCACHE: true, {RHVOICE_FCACHE: true, RHVOICE_FCACHE_LIFETIME: 1}]
-          os: [ubuntu-20.04, windows-2019]
-          include:
-            - os: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        env: [CHUNKED_TRANSFER: true, RHVOICE_DYNCACHE: true, RHVOICE_FCACHE: true, {RHVOICE_FCACHE: true, RHVOICE_FCACHE_LIFETIME: 1}]
+        os: [ubuntu-20.04, windows-2019]
+        include:
+          - os: ubuntu-20.04
 #            - os: ubuntu-20.04
 #              env:
 #                CHUNKED_TRANSFER: true
@@ -33,9 +33,9 @@ jobs:
 #              env:
 #                RHVOICE_FCACHE: true
 #                RHVOICE_FCACHE_LIFETIME: 1
-            - os: windows-2019
-              env:
-                THREADED: 1
+          - os: windows-2019
+            env:
+              THREADED: 1
 #            - os: windows-2019
 #              env:
 #                CHUNKED_TRANSFER: true
