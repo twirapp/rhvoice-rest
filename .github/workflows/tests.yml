@@ -1,0 +1,97 @@
+name: Tests
+
+on:
+  push:
+    branches: [ master]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    env:
+      PYTHONUNBUFFERED: 1
+      THREADED: 2
+    runs-on: ${{ matrix.os }}
+      strategy:
+        fail-fast: false
+        matrix:
+          env: [CHUNKED_TRANSFER: true, RHVOICE_DYNCACHE: true, RHVOICE_FCACHE: true, {RHVOICE_FCACHE: true, RHVOICE_FCACHE_LIFETIME: 1}]
+          os: [ubuntu-20.04, windows-2019]
+          include:
+            - os: ubuntu-20.04
+#            - os: ubuntu-20.04
+#              env:
+#                CHUNKED_TRANSFER: true
+#            - os: ubuntu-20.04
+#              env:
+#                RHVOICE_DYNCACHE: true
+#            - os: ubuntu-20.04
+#              env:
+#                RHVOICE_FCACHE: true
+#            - os: ubuntu-20.04
+#              env:
+#                RHVOICE_FCACHE: true
+#                RHVOICE_FCACHE_LIFETIME: 1
+            - os: windows-2019
+              env:
+                THREADED: 1
+#            - os: windows-2019
+#              env:
+#                CHUNKED_TRANSFER: true
+#            - os: windows-2019
+#              env:
+#                RHVOICE_DYNCACHE: true
+#            - os: windows-2019
+#              env:
+#                RHVOICE_FCACHE: true
+#            - os: windows-2019
+#              env:
+#                RHVOICE_FCACHE: true
+#                RHVOICE_FCACHE_LIFETIME: 1
+
+
+    steps:
+    - name: Prepare on Linux
+      if: ${{ matrix.os == 'ubuntu-20.04' }}
+      run: |
+        env
+        docker --version
+        docker build -t aculeasis/rhvoice-rest-test:amd64 -f Dockerfile.amd64 .
+        docker run -d -p 8080:8080 -e THREADED=4 -e RHVOICE_FCACHE_LIFETIME \
+        -e RHVOICE_FCACHE -e RHVOICE_DYNCACHE -e CHUNKED_TRANSFER --name rhvoice-rest aculeasis/rhvoice-rest-test:amd64
+        sleep 5
+        docker images
+        docker ps -a
+        pip install aiohttp
+    - name: Prepare on Windows
+      if: ${{ matrix.os == 'windows-2019' }}
+      run: |
+        pip install -q --upgrade wheel
+        pip install -q flask pymorphy2 rhvoice-wrapper rhvoice-wrapper-bin aiohttp --only-binary rhvoice-wrapper-bin rhvoice-wrapper
+        git clone -q --depth=1 https://github.com/vantu5z/RHVoice-dictionary
+        xcopy /s /I /Q RHVoice-dictionary\tools\preprocessing rhvoice_tools
+
+    - name: Tests on Linux
+      if: ${{ matrix.os == 'ubuntu-20.04' }}
+      run: python -u example/threaded_test.py 16
+    - name: Test on Windows
+      if: ${{ matrix.os == 'windows-2019' }}
+      run: |
+        $MyProcess = Start-Process "python" -ArgumentList "-u","app.py" -RedirectStandardOutput "logs" -PassThru
+        Start-Sleep -s 5
+        python -u example/threaded_test.py 5
+
+    - name: Result on Linux
+      continue-on-error: true
+      if: ${{ matrix.os == 'ubuntu-20.04' }}
+      run: |
+        docker stop rhvoice-rest
+        docker logs rhvoice-rest
+        docker ps -a
+    - name: Result on Windows
+      continue-on-error: true
+      if: ${{ matrix.os == 'windows-2019' }}
+      run: |
+        Stop-Process -Id $MyProcess.Id
+        type logs
