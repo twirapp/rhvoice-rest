@@ -46,7 +46,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set THREADED=${{ matrix.THREADED != '' }} on Windows
+    - name: Set THREADED=${{ matrix.THREADED }} on Windows
       if: ${{ matrix.THREADED != '' && matrix.os == 'windows-2019'}}
       run: echo "THREADED=${{ matrix.THREADED }}" >> $env:GITHUB_ENV
 
