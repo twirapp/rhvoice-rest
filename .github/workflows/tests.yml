@@ -11,6 +11,7 @@ jobs:
   test:
     env:
       PYTHONUNBUFFERED: 1
+      THREADED: 4
       CHUNKED_TRANSFER: ${{ matrix.CHUNKED_TRANSFER }}
       RHVOICE_DYNCACHE: ${{ matrix.RHVOICE_DYNCACHE }}
       RHVOICE_FCACHE: ${{ matrix.RHVOICE_FCACHE }}
@@ -45,12 +46,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set THREADED=${{ matrix.THREADED }}
-      if: ${{ matrix.THREADED != '' }}
-      run: echo "THREADED=${{ matrix.THREADED }}" >> $GITHUB_ENV
-    - name: Set THREADED=4
-      if: ${{ matrix.THREADED == '' }}
-      run: echo "THREADED=4" >> $GITHUB_ENV
+    - name: Set THREADED=${{ matrix.THREADED != '' }} on Windows
+      if: ${{ matrix.THREADED != '' && matrix.os == 'windows-2019'}}
+      run: echo "THREADED=${{ matrix.THREADED }}" >> $env:GITHUB_ENV
 
     - name: Prepare on Linux
       if: ${{ matrix.os == 'ubuntu-20.04' }}
