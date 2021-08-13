@@ -11,54 +11,53 @@ jobs:
   test:
     env:
       PYTHONUNBUFFERED: 1
-      THREADED: 2
+      THREADED: 4
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        env: [CHUNKED_TRANSFER: true, RHVOICE_DYNCACHE: true, RHVOICE_FCACHE: true, {RHVOICE_FCACHE: true, RHVOICE_FCACHE_LIFETIME: 1}]
-        os: [ubuntu-20.04, windows-2019]
         include:
           - os: ubuntu-20.04
-#            - os: ubuntu-20.04
-#              env:
-#                CHUNKED_TRANSFER: true
-#            - os: ubuntu-20.04
-#              env:
-#                RHVOICE_DYNCACHE: true
-#            - os: ubuntu-20.04
-#              env:
-#                RHVOICE_FCACHE: true
-#            - os: ubuntu-20.04
-#              env:
-#                RHVOICE_FCACHE: true
-#                RHVOICE_FCACHE_LIFETIME: 1
+          - os: ubuntu-20.04
+            env:
+              CHUNKED_TRANSFER: true
+          - os: ubuntu-20.04
+            env:
+              RHVOICE_DYNCACHE: true
+          - os: ubuntu-20.04
+            env:
+              RHVOICE_FCACHE: true
+          - os: ubuntu-20.04
+            env:
+              RHVOICE_FCACHE: true
+              RHVOICE_FCACHE_LIFETIME: 1
+
           - os: windows-2019
             env:
               THREADED: 1
-#            - os: windows-2019
-#              env:
-#                CHUNKED_TRANSFER: true
-#            - os: windows-2019
-#              env:
-#                RHVOICE_DYNCACHE: true
-#            - os: windows-2019
-#              env:
-#                RHVOICE_FCACHE: true
-#            - os: windows-2019
-#              env:
-#                RHVOICE_FCACHE: true
-#                RHVOICE_FCACHE_LIFETIME: 1
-
+          - os: windows-2019
+            env:
+              CHUNKED_TRANSFER: true
+          - os: windows-2019
+            env:
+              RHVOICE_DYNCACHE: true
+          - os: windows-2019
+            env:
+              RHVOICE_FCACHE: true
+          - os: windows-2019
+            env:
+              RHVOICE_FCACHE: true
+              RHVOICE_FCACHE_LIFETIME: 1
 
     steps:
+    - uses: actions/checkout@v2
     - name: Prepare on Linux
       if: ${{ matrix.os == 'ubuntu-20.04' }}
       run: |
         env
         docker --version
         docker build -t aculeasis/rhvoice-rest-test:amd64 -f Dockerfile.amd64 .
-        docker run -d -p 8080:8080 -e THREADED=4 -e RHVOICE_FCACHE_LIFETIME \
+        docker run -d -p 8080:8080 -e THREADED -e RHVOICE_FCACHE_LIFETIME \
         -e RHVOICE_FCACHE -e RHVOICE_DYNCACHE -e CHUNKED_TRANSFER --name rhvoice-rest aculeasis/rhvoice-rest-test:amd64
         sleep 5
         docker images
