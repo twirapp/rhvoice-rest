@@ -24,8 +24,6 @@
     docker build -t rhvoice-rest -f Dockerfile.arm64v8 .
     docker run -d -p 8080:8080 rhvoice-rest
 
-`Dockerfile.arm64v8` использует заранее собранный `rhvoice-wrapper-bin` (зеро часто не хватает памяти на сборку), для полной сборки используйте `Dockerfile.arm64v8.src`
-    
 ## API
     http://SERVER/say?
     text=<текст>
