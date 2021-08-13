@@ -12,6 +12,10 @@ jobs:
     env:
       PYTHONUNBUFFERED: 1
       THREADED: 4
+      CHUNKED_TRANSFER: ${{ matrix.CHUNKED_TRANSFER }}
+      RHVOICE_DYNCACHE: ${{ matrix.RHVOICE_DYNCACHE }}
+      RHVOICE_FCACHE: ${{ matrix.RHVOICE_FCACHE }}
+      RHVOICE_FCACHE_LIFETIME: ${{ matrix.RHVOICE_FCACHE_LIFETIME }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -19,38 +23,33 @@ jobs:
         include:
           - os: ubuntu-20.04
           - os: ubuntu-20.04
-            env:
-              CHUNKED_TRANSFER: true
+            CHUNKED_TRANSFER: true
           - os: ubuntu-20.04
-            env:
-              RHVOICE_DYNCACHE: true
+            RHVOICE_DYNCACHE: true
           - os: ubuntu-20.04
-            env:
-              RHVOICE_FCACHE: true
+            RHVOICE_FCACHE: true
           - os: ubuntu-20.04
-            env:
-              RHVOICE_FCACHE: true
-              RHVOICE_FCACHE_LIFETIME: 1
+            RHVOICE_FCACHE: true
+            RHVOICE_FCACHE_LIFETIME: 1
 
           - os: windows-2019
-            env:
-              THREADED: 1
+            THREADED: 1
           - os: windows-2019
-            env:
-              CHUNKED_TRANSFER: true
+            CHUNKED_TRANSFER: true
           - os: windows-2019
-            env:
-              RHVOICE_DYNCACHE: true
+            RHVOICE_DYNCACHE: true
           - os: windows-2019
-            env:
-              RHVOICE_FCACHE: true
+            RHVOICE_FCACHE: true
           - os: windows-2019
-            env:
-              RHVOICE_FCACHE: true
-              RHVOICE_FCACHE_LIFETIME: 1
+            RHVOICE_FCACHE: true
+            RHVOICE_FCACHE_LIFETIME: 1
 
     steps:
     - uses: actions/checkout@v2
+    - name: Fix THREADED
+      if: ${{ matrix.THREADED != '' }}
+      run: echo "THREADED=${{ matrix.THREADED }}" >> $GITHUB_ENV
+
     - name: Prepare on Linux
       if: ${{ matrix.os == 'ubuntu-20.04' }}
       run: |
@@ -79,7 +78,7 @@ jobs:
       run: |
         $MyProcess = Start-Process "python" -ArgumentList "-u","app.py" -RedirectStandardOutput "logs" -PassThru
         Start-Sleep -s 5
-        python -u example/threaded_test.py 5
+        python -u example/threaded_test.py 16
 
     - name: Result on Linux
       continue-on-error: true
@@ -92,5 +91,5 @@ jobs:
       continue-on-error: true
       if: ${{ matrix.os == 'windows-2019' }}
       run: |
-        Stop-Process -Id $MyProcess.Id
+#        Stop-Process -Id $MyProcess.Id
         type logs

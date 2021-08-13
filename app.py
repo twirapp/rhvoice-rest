@@ -93,7 +93,7 @@ def _get_def(any_, test, def_=None):
 
 
 def _check_env(word: str) -> bool:
-    return word in os.environ and os.environ[word].lower() not in ['no', 'disable', 'false']
+    return word in os.environ and os.environ[word].lower() not in ['no', 'disable', 'false', '']
 
 
 def _get_cache_path():
