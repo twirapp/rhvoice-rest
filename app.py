@@ -5,7 +5,7 @@ import sys
 from shlex import quote
 from urllib import parse
 
-from flask import Flask, request, make_response, Response, stream_with_context
+from flask import Flask, request, make_response, Response, stream_with_context, escape
 from rhvoice_wrapper import TTS
 
 from rhvoice_rest_cache import CacheWorker
@@ -60,9 +60,9 @@ def say():
     format_ = request.args.get('format', DEFAULT_FORMAT)
 
     if voice not in SUPPORT_VOICES:
-        return make_response('Unknown voice: \'{}\'. Support: {}.'.format(voice, ', '.join(SUPPORT_VOICES)), 400)
+        return make_response('Unknown voice: \'{}\'. Support: {}.'.format(escape(voice), ', '.join(SUPPORT_VOICES)), 400)
     if format_ not in FORMATS:
-        return make_response('Unknown format: \'{}\'. Support: {}.'.format(format_, ', '.join(FORMATS)), 400)
+        return make_response('Unknown format: \'{}\'. Support: {}.'.format(escape(format_), ', '.join(FORMATS)), 400)
     if not text:
         return make_response('Unset \'text\'.', 400)
 
