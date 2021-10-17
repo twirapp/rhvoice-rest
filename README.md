@@ -27,13 +27,15 @@
     http://SERVER/say?
     text=<текст>
     & voice=<
-             aleksandr|anna|elena|irina| # Russian
+             aleksandr|anna|arina|artemiy|elena|irina|pavel| # Russian
              alan|bdl|clb|slt| # English
              spomenka| # Esperanto
              natia| # Georgian
              azamat|nazgul| # Kyrgyz
              talgat| # Tatar
-             anatol|natalia # Ukrainian
+             anatol|natalia| # Ukrainian
+             kiko| # Macedonian
+             letícia-f123 # Portuguese
              >
     & format=<wav|mp3|opus|flac>
     & rate=0..100
