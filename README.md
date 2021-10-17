@@ -103,5 +103,5 @@
 <http://localhost:8080/say?text=Kaj%20mi%20ankaŭ%20parolas%20Esperanton&voice=spomenka&format=opus>
 
 ## Интеграция
-- [Home Assistant](https://github.com/mgarmash/ha-rhvoice-tts)
+- [Home Assistant](https://github.com/definitio/ha-rhvoice)
 - [Примеры](https://github.com/Aculeasis/rhvoice-rest/tree/master/example)
