@@ -80,6 +80,23 @@ def say():
     return Response(stream_with_context(stream), mimetype=FORMATS[format_], headers=set_headers())
 
 
+@app.route('/info')
+def info():
+    return make_response({
+        'DEFAULT_VOICE': DEFAULT_VOICE,
+        'FORMATS': FORMATS,
+        'DEFAULT_FORMAT': DEFAULT_FORMAT,
+        'SUPPORT_VOICES': list(SUPPORT_VOICES),
+        'rhvoice_wrapper_voices_info': tts.voices_info,
+        'rhvoice_wrapper_voice_profiles': tts.voice_profiles,
+        'rhvoice_wrapper_api_version': tts.api_version,
+        'rhvoice_wrapper_library_version': tts.lib_version,
+        'rhvoice_wrapper_thread_count': tts.thread_count,
+        'rhvoice_wrapper_process': tts.process,
+        'rhvoice_wrapper_cmd': tts.cmd,
+    })
+
+
 def _normalize_set(val):  # 0..100 -> -1.0..1
     try:
         return max(0, min(100, int(val)))/50.0-1
