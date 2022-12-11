@@ -57,6 +57,17 @@
 
 `volume` - Громкость голоса. По умолчанию `50`.
 
+### Rhasspy Voice Assistant
+Для интеграции в [Rhasspy](https://rhasspy.readthedocs.io/en/latest/) через [Remote](https://rhasspy.readthedocs.io/en/latest/text-to-speech/#remote) замените `/say` на `/rhasspy`. Аргументы `text` и `format` игнорируются (формат всегда wav, а текст передается в теле POST).
+```
+"text_to_speech": {
+  "system": "remote",
+  "remote": {
+      "url": "http://localhost:8080/rhasspy?voice=anna"
+  }
+}
+```
+
 ## Нативный запуск
 Для начала нужно установить зависимости:
 
