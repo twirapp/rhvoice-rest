@@ -13,6 +13,13 @@ docker run -d \
   --restart unless-stopped \
   aculeasis/rhvoice-rest:latest
 ```
+Поддерживаемые архитектуры:
+| Architecture | Available | Tag |
+| :----: | :----: | ---- |
+| x86-64 | ✅ | amd64 |
+| arm64 | ✅ | arm64v8 |
+| armhf | ✅ | arm32v7 |
+
 Для автоматического обновления можно использовать [Watchtower](https://github.com/containrrr/watchtower).
 
 ## API
@@ -92,7 +99,7 @@ docker run -d \
 ## Настройки
 Все настройки задаются через переменные окружения, до запуска скрипта или при создании докер-контейнера (через `-e`):
 - **RHVOICELIBPATH**: Путь до библиотеки RHVoice. По умолчанию `RHVoice.dll` в Windows и `libRHVoice.so` в Linux.
-- **RHVOICEDATAPATH**:  Путь до данных RHVoice. По умолчанию `/usr/local/share/RHVoice`.
+- **RHVOICEDATAPATH**: Путь до данных RHVoice. По умолчанию `/usr/local/share/RHVoice`.
 - **THREADED**: Количество запущенных процессов синтеза, определяет количество запросов которые могут быть обработаны одновременно. Если `> 1` генераторы будут запущены в качестве отдельных процессов что существенно увеличит потребление памяти. Рекомендуемое максимальное значение `1.5 * core count`. По умолчанию `1`.
 - **LAMEPATH**: Путь до `lame` или `lame.exe`, если файл не найден поддержка `mp3` будет отключена. По умолчанию `lame`.
 - **OPUSENCPATH**: Путь до `opusenc` или `opusenc.exe`, если файл не найден поддержка `opus` будет отключена. По умолчанию `opusenc`.
