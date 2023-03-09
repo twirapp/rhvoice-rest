@@ -6,22 +6,14 @@
 Это веб-сервис на основе flask и синтезатора речи [RHVoice](https://github.com/Olga-Yakovleva/RHVoice). Благодаря REST API его легко интегрировать в качестве TTS-провайдера.
 
 ## Docker
-### Через скрипт docker_starter
-Запуск\обновление из хаба: `./rhvoice_rest.py --upgrade`
-
-Полное описание [тут](https://github.com/Aculeasis/docker-starter)
-
-### Готовые докеры
-- aarch64 `docker run -d -p 8080:8080 aculeasis/rhvoice-rest:arm64v8`
-- armv7l `docker run -d -p 8080:8080 aculeasis/rhvoice-rest:arm32v7`
-- x86_64 `docker run -d -p 8080:8080 aculeasis/rhvoice-rest:amd64`
-
-### Сборка и запуск докера
-    git clone https://github.com/Aculeasis/rhvoice-rest
-    cd rhvoice-rest
-    # Указать Dockerfile под целевую архитектуру
-    docker build -t rhvoice-rest -f Dockerfile.arm64v8 .
-    docker run -d -p 8080:8080 rhvoice-rest
+```bash
+docker run -d \
+  --name=rhvoice-rest \
+  -p 8080:8080 \
+  --restart unless-stopped \
+  aculeasis/rhvoice-rest:latest
+```
+Для автоматического обновления можно использовать [Watchtower](https://github.com/containrrr/watchtower).
 
 ## API
     http://SERVER/say?
