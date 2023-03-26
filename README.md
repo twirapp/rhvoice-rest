@@ -57,8 +57,8 @@ docker run -d \
 `volume` - Громкость голоса. По умолчанию `50`.
 
     http://SERVER/info - выводит различную информацию о сервере в JSON.
-
-### Rhasspy Voice Assistant
+## Интеграция
+- ### Rhasspy Voice Assistant
 Для интеграции в [Rhasspy](https://rhasspy.readthedocs.io/en/latest/) через [Remote](https://rhasspy.readthedocs.io/en/latest/text-to-speech/#remote) замените `/say` на `/rhasspy`. Аргументы `text` и `format` игнорируются (формат всегда wav, а текст передается в теле POST).
 ```
 "text_to_speech": {
@@ -68,6 +68,8 @@ docker run -d \
   }
 }
 ```
+- ### [Home Assistant](https://github.com/definitio/ha-rhvoice)
+- ### [Примеры](https://github.com/Aculeasis/rhvoice-rest/tree/master/example)
 
 ## Нативный запуск
 Для начала нужно установить зависимости:
@@ -115,7 +117,3 @@ docker run -d \
 <http://localhost:8080/say?text=Привет%20еще%20раз&format=opus>
 
 <http://localhost:8080/say?text=Kaj%20mi%20ankaŭ%20parolas%20Esperanton&voice=spomenka&format=opus>
-
-## Интеграция
-- [Home Assistant](https://github.com/definitio/ha-rhvoice)
-- [Примеры](https://github.com/Aculeasis/rhvoice-rest/tree/master/example)
