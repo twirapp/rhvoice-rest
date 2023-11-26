@@ -3,7 +3,7 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/aculeasis/rhvoice-rest.svg)](https://hub.docker.com/r/aculeasis/rhvoice-rest/)
 [![Tests](https://github.com/Aculeasis/rhvoice-rest/actions/workflows/tests.yml/badge.svg)](https://github.com/Aculeasis/rhvoice-rest/actions/workflows/tests.yml)
 
-Это веб-сервис на основе flask и синтезатора речи [RHVoice](https://github.com/Olga-Yakovleva/RHVoice). Благодаря REST API его легко интегрировать в качестве TTS-провайдера.
+Это веб-сервис на основе flask и синтезатора речи [RHVoice](https://github.com/RHVoice/RHVoice). Благодаря REST API его легко интегрировать в качестве TTS-провайдера.
 
 ## Docker
 ```bash
@@ -45,7 +45,7 @@ docker run -d \
 
 `text` - URL-encoded строка. Обязательный параметр.
 
-`voice` - Голос из RHVoice [полный список](https://github.com/Olga-Yakovleva/RHVoice/wiki/Latest-version-%28Russian%29).
+`voice` - Голос из RHVoice (актуальный список - `http://SERVER/voices`).
 `anna` используется по умолчанию и в качестве альтернативного спикера.
 
 `format` - Формат возвращаемого файла. По умолчанию `mp3`.
@@ -76,7 +76,7 @@ docker run -d \
 
 `pip3 install flask pymorphy2 rhvoice-wrapper`
 
-Собрать и установить [RHVoice](https://github.com/Olga-Yakovleva/RHVoice) или установить [rhvoice-wrapper-bin](https://github.com/Aculeasis/rhvoice-wrapper-bin) предоставляющий библиотеки и данные RHVoice. Второй вариант рекомендуется для Windows т.к. не требует сборки.
+Собрать и установить [RHVoice](https://github.com/RHVoice/RHVoice) или установить [rhvoice-wrapper-bin](https://github.com/Aculeasis/rhvoice-wrapper-bin) предоставляющий библиотеки и данные RHVoice. Второй вариант рекомендуется для Windows т.к. не требует сборки.
 
 И еще рядом с app.py положить `rhvoice_tools` - переименовав `preprocessing` из [RHVoice-dictionary/tools](https://github.com/vantu5z/RHVoice-dictionary/tree/master/tools).
 

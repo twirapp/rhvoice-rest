@@ -98,6 +98,20 @@ def info():
     })
 
 
+@app.route('/voices')
+def voices():
+    voices_ = dict()
+    for data in tts.voices_info.values():
+        if data['lang'] not in voices_:
+            voices_[data['lang']] = list()
+        voices_[data['lang']].append(data['name'])
+    data = ''
+    for key, val in voices_.items():
+        val.sort()
+        data += '{}| # {}<br>\n'.format('|'.join(val), key)
+    return make_response(data)
+
+
 def _normalize_set(val):  # 0..100 -> -1.0..1
     try:
         return max(0, min(100, int(val)))/50.0-1
