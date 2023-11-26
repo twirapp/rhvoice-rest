@@ -60,12 +60,13 @@ jobs:
         sleep 5
         docker images
         docker ps -a
+        docker logs rhvoice-rest
         pip install aiohttp
     - name: Prepare on Windows
       if: ${{ matrix.os == 'windows-2019' }}
       run: |
         pip install -q --upgrade wheel
-        pip install -q flask pymorphy2 rhvoice-wrapper rhvoice-wrapper-bin aiohttp --only-binary rhvoice-wrapper-bin rhvoice-wrapper
+        pip install -q MarkupSafe flask pymorphy2 pymorphy2-dicts-ru rhvoice-wrapper rhvoice-wrapper-bin aiohttp --only-binary rhvoice-wrapper-bin rhvoice-wrapper
         git clone -q --depth=1 https://github.com/vantu5z/RHVoice-dictionary
         xcopy /s /I /Q RHVoice-dictionary\tools\preprocessing rhvoice_tools
 
