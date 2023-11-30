@@ -26,15 +26,21 @@ docker run -d \
     http://SERVER/say?
     text=<текст>
     & voice=<
-             aleksandr|anna|arina|artemiy|elena|irina|pavel| # Russian
-             alan|bdl|clb|slt| # English
-             spomenka| # Esperanto
-             natia| # Georgian
+             alan|bdl|clb|evgeniy-eng|lyubov|slt| # American English
+             aleksandr|aleksandr-hq|anna|arina|artemiy|elena|evgeniy-rus|irina|mikhail| # Russian
+             pavel|tatiana|timofey|umka|victoria|vitaliy|vitaliy-ng|vsevolod|yuriy| # Russian
+             alicja|cezary|magda|michal|natan| # Polish
+             anatol|marianna|natalia|volodymyr| # Ukrainian
              azamat|nazgul| # Kyrgyz
+             hana| # Albanian
+             kiko|suze| # Macedonian
+             letícia-f123| # Brazilian Portuguese
+             natia| # Georgian
+             ondro| # Slovak
+             sevinch| # Uzbek
+             spomenka| # Esperanto
              talgat| # Tatar
-             anatol|natalia| # Ukrainian
-             kiko| # Macedonian
-             letícia-f123 # Portuguese
+             zdenek # Czech
              >
     & format=<wav|mp3|opus|flac>
     & rate=0..100
