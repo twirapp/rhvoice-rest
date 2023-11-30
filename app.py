@@ -101,10 +101,10 @@ def info():
 @app.route('/voices')
 def voices():
     voices_ = dict()
-    for data in tts.voices_info.values():
+    for name, data in tts.voices_info.items():
         if data['lang'] not in voices_:
             voices_[data['lang']] = list()
-        voices_[data['lang']].append(data['name'])
+        voices_[data['lang']].append(name)
     data = ''
     for key, val in voices_.items():
         val.sort()
