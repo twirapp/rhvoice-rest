@@ -1,7 +1,7 @@
 # docker build -t aculeasis/rhvoice-rest:amd64 -f Dockerfile.amd64 .
 FROM amd64/ubuntu:20.04
 
-ARG RUNTIME_PACKAGES="lame python3 locales opus-tools flac python3-setuptools"
+ARG RUNTIME_PACKAGES="lame python3 locales opus-tools flac python3-setuptools curl"
 ARG BUILD_PACKAGES="git python3-pip python3-wheel wget ca-certificates"
 ARG PIP_PACKAGE="MarkupSafe flask pymorphy2 pymorphy2-dicts-ru rhvoice-wrapper"
 
