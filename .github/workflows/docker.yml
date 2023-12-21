@@ -15,8 +15,8 @@ jobs:
 
       - run: |
           docker build -f ./Dockerfile.amd64 \
-          -t ${{ secrets.DOCKER_REGISTRY }}/twir/tts:latest \
+          -t satont/twir-tts:latest \
           --cache-from type=gha,scope=twir-tts \
           --cache-to type=gha,mode=max,scope=twir-tts .
 
-          docker push ${{ secrets.DOCKER_REGISTRY }}/twir/tts:latest
+          docker push satont/twir-tts:latest
